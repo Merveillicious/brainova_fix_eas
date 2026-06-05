@@ -267,4 +267,50 @@ class TutorController extends Controller
 
         return redirect()->route('tutor.dashboard')->with('success', 'Status booking berhasil diperbarui.');
     }
+
+    public function pendapatan()
+    {
+        $userId = session('user.id');
+        $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
+        return view('tutor.pendapatan', compact('tutor'));
+    }
+
+    public function ulasan()
+    {
+        $userId = session('user.id');
+        $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
+        return view('tutor.ulasan', compact('tutor'));
+    }
+
+    public function pesan()
+    {
+        $userId   = session('user.id');
+        $tutor    = Tutor::with('subject')->where('user_id', $userId)->first();
+        $students = collect();
+
+        if ($tutor) {
+            $students = \App\Models\Student::whereHas('bookings', function ($q) use ($tutor) {
+                $q->whereHas('schedule', fn($sq) => $sq->where('tutor_id', $tutor->id));
+            })->get();
+        }
+
+        return view('tutor.pesan', compact('tutor', 'students'));
+    }
+
+    public function pengaturan()
+    {
+        $userId = session('user.id');
+        $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
+        return view('tutor.pengaturan', compact('tutor'));
+    }
+
+    public function updateProfilAkun(Request $request)
+    {
+        return redirect()->route('tutor.pengaturan')->with('success', 'Profil akun berhasil diperbarui.');
+    }
+
+    public function updateSandiAkun(Request $request)
+    {
+        return redirect()->route('tutor.pengaturan')->with('success', 'Kata sandi berhasil diperbarui.');
+    }
 }

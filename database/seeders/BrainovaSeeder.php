@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class BrainovaSeeder extends Seeder
 {
@@ -13,7 +14,7 @@ class BrainovaSeeder extends Seeder
         $adminId = DB::table('users')->insertGetId([
             'name'       => 'Admin Brainova',
             'email'      => 'admin@brainova.com',
-            'password'   => 'admin123',
+            'password'   => Hash::make('admin123'),
             'role'       => 'admin',
             'created_at' => now(),
             'updated_at' => now(),
@@ -22,7 +23,7 @@ class BrainovaSeeder extends Seeder
         $siswaId = DB::table('users')->insertGetId([
             'name'       => 'Siswa Demo',
             'email'      => 'siswa@demo.com',
-            'password'   => 'siswa123',
+            'password'   => Hash::make('siswa123'),
             'role'       => 'siswa',
             'created_at' => now(),
             'updated_at' => now(),
@@ -31,7 +32,7 @@ class BrainovaSeeder extends Seeder
         $tutorId = DB::table('users')->insertGetId([
             'name'       => 'Tutor Demo',
             'email'      => 'tutor@demo.com',
-            'password'   => 'tutor123',
+            'password'   => Hash::make('tutor123'),
             'role'       => 'tutor',
             'created_at' => now(),
             'updated_at' => now(),

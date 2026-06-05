@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulasan Saya - Brainova</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    <style>
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
+
+        /* ── Page Header ── */
+        .ul-page-title { font-size: 28px; font-weight: 800; color: #000; letter-spacing: -.5px; margin-bottom: 4px; }
+        .ul-page-sub   { font-size: 14px; color: #6b7280; margin-bottom: 28px; }
+
+        /* ── Rating Summary Card ── */
+        .rating-summary {
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        /* Big score */
+        .rating-big-score {
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .rating-big-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: #000;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .rating-big-stars { display: flex; gap: 3px; justify-content: center; margin-bottom: 6px; }
+        .star-filled { color: #FBBF24; font-size: 20px; }
+        .star-empty  { color: #e5e7eb; font-size: 20px; }
+        .star-half   { position: relative; font-size: 20px; }
+        .rating-big-count { font-size: 13px; color: #6b7280; }
+
+        /* Divider */
+        .rating-divider {
+            width: 1px;
+            height: 100px;
+            background: #f3f4f6;
+            flex-shrink: 0;
+        }
+
+        /* Bar breakdown */
+        .rating-bars { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .rating-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .rating-bar-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            width: 16px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .rating-bar-star { color: #FBBF24; font-size: 13px; flex-shrink: 0; }
+        .rating-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rating-bar-fill {
+            height: 100%;
+            background: #FBBF24;
+            border-radius: 4px;
+            transition: width .6s ease;
+        }
+        .rating-bar-count {
+            font-size: 12px;
+            color: #9ca3af;
+            width: 28px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Stats row */
+        .rating-stats {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .rating-stat-item { text-align: center; }
+        .rating-stat-val  { font-size: 22px; font-weight: 800; color: #000; }
+        .rating-stat-lbl  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+        /* ── Filter tabs ── */
+        .ul-filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .ul-filter-btn {
+            padding: 8px 16px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            background: #fff;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+        }
+        .ul-filter-btn:hover { border-color: #FBBF24; color: #000; }
+        .ul-filter-btn.active {
+            background: #FBBF24;
+            border-color: #FBBF24;
+            color: #000;
+        }
+
+        /* ── Review Cards ── */
+        .ul-reviews-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .ul-review-card {
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 20px 22px;
+            transition: box-shadow .2s, border-color .2s;
+        }
+        .ul-review-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+            border-color: #e0e0e0;
+        }
+
+        .ul-review-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        .ul-reviewer-left { display: flex; align-items: center; gap: 12px; }
+        .ul-reviewer-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .ul-reviewer-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 2px;
+        }
+        .ul-reviewer-meta { font-size: 12px; color: #9ca3af; }
+
+        .ul-review-right { text-align: right; flex-shrink: 0; }
+        .ul-review-stars { display: flex; gap: 2px; justify-content: flex-end; margin-bottom: 4px; }
+        .ul-star { color: #FBBF24; font-size: 16px; }
+        .ul-star.empty { color: #e5e7eb; }
+        .ul-review-date { font-size: 12px; color: #9ca3af; }
+
+        .ul-review-body {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-radius: 10px;
+            border-left: 3px solid #FBBF24;
+            font-style: italic;
+        }
+
+        .ul-review-subject {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .ul-subject-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f3f4f6;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Tutor reply */
+        .ul-reply-box {
+            margin-top: 14px;
+            background: #fff8e6;
+            border: 1.5px solid #fde68a;
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+        .ul-reply-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #92400e;
+            margin-bottom: 6px;
+        }
+        .ul-reply-text { font-size: 13px; color: #374151; line-height: 1.6; }
+
+        .btn-balas {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin-top: 12px;
+            transition: all .15s;
+        }
+        .btn-balas:hover { border-color: #FBBF24; color: #000; }
+
+        /* Empty state */
+        .ul-empty {
+            background: #fff;
+            border: 1.5px dashed #e5e7eb;
+            border-radius: 14px;
+            text-align: center;
+            padding: 60px 24px;
+        }
+        .ul-empty-icon { font-size: 40px; margin-bottom: 12px; }
+        .ul-empty-title { font-size: 16px; font-weight: 700; color: #374151; margin-bottom: 4px; }
+        .ul-empty-sub   { font-size: 13px; color: #9ca3af; }
+
+        /* Alert */
+        .alert-success { background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;font-size:14px;color:#166534;margin-bottom:20px; }
+        .alert-error   { background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;margin-bottom:20px; }
+
+        @media (max-width: 768px) {
+            .rating-summary { flex-direction: column; gap: 24px; }
+            .rating-divider { width: 100%; height: 1px; }
+        }
+    </style>
+</head>
+<body>
+<div class="siswa-layout">
+
+    @include('tutor.partials.sidebar')
+
+    <main class="siswa-main" style="max-height: 100vh; overflow-y: auto;">
+
+        @if(session('success'))
+            <div class="alert-success">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert-error">{{ session('error') }}</div>
+        @endif
+
+        <h1 class="ul-page-title">Ulasan Saya</h1>
+        <p class="ul-page-sub">Ulasan yang diberikan oleh siswa kepada Anda.</p>
+
+        @php
+            /* ── Demo data ── */
+            $demoReviews = [
+                ['nama' => 'Sarah M.',      'inisial' => 'SM', 'warna' => '#6366f1', 'rating' => 5, 'komentar' => 'Tutor sangat sabar dan jelas dalam menjelaskan materi. Saya yang tadinya kesulitan memahami aljabar linear sekarang sudah bisa mengerjakan soalnya. Terima kasih banyak!', 'mapel' => 'Matematika SMA', 'tanggal' => '24 Okt 2023'],
+                ['nama' => 'Rizky P.',      'inisial' => 'RP', 'warna' => '#10b981', 'rating' => 5, 'komentar' => 'Materinya disampaikan dengan sangat sistematis. Tutor juga responsif menjawab pertanyaan di luar jam belajar.', 'mapel' => 'Fisika Dasar', 'tanggal' => '20 Okt 2023'],
+                ['nama' => 'Dewi Lestari',  'inisial' => 'DL', 'warna' => '#ef4444', 'rating' => 4, 'komentar' => 'Penjelasannya mudah dipahami, contoh soal yang diberikan juga sangat relevan. Semoga bisa lanjut belajar lagi!', 'mapel' => 'Persiapan UTBK', 'tanggal' => '15 Okt 2023'],
+                ['nama' => 'Andi Saputra',  'inisial' => 'AS', 'warna' => '#8b5cf6', 'rating' => 5, 'komentar' => 'Luar biasa! Tutor terbaik yang pernah saya temui. Nilai ujian saya naik drastis setelah les di sini.', 'mapel' => 'Kimia Dasar', 'tanggal' => '10 Okt 2023'],
+                ['nama' => 'Wulan Dewi',    'inisial' => 'WD', 'warna' => '#f59e0b', 'rating' => 4, 'komentar' => 'Cukup bagus, materinya tersampaikan dengan baik. Waktu belajarnya juga fleksibel.', 'mapel' => 'Matematika SMA', 'tanggal' => '5 Okt 2023'],
+                ['nama' => 'Budi Santoso',  'inisial' => 'BS', 'warna' => '#0ea5e9', 'rating' => 3, 'komentar' => 'Penjelasan sudah cukup, tapi kadang terlalu cepat. Perlu diperlambat sedikit supaya saya bisa menyimak.', 'mapel' => 'Fisika Dasar', 'tanggal' => '1 Okt 2023'],
+            ];
+
+            // Coba ambil dari DB
+            $realReviews = collect();
+            if (isset($tutor) && $tutor) {
+                $realReviews = \App\Models\Review::whereHas('booking.schedule', fn($q) => $q->where('tutor_id', $tutor->id))
+                    ->with(['booking.student', 'booking.schedule.subject'])
+                    ->orderByDesc('created_at')
+                    ->get();
+            }
+            $hasReal = $realReviews->isNotEmpty();
+
+            // Hitung statistik dari demo
+            $totalReviews   = count($demoReviews);
+            $avgRating      = round(array_sum(array_column($demoReviews, 'rating')) / $totalReviews, 1);
+            $bintangCount   = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+            foreach ($demoReviews as $r) { $bintangCount[$r['rating']]++; }
+        @endphp
+
+        {{-- ══ Rating Summary ══ --}}
+        <div class="rating-summary">
+
+            {{-- Big score --}}
+            <div class="rating-big-score">
+                <div class="rating-big-number">{{ $avgRating }}</div>
+                <div class="rating-big-stars">
+                    @for($s = 1; $s <= 5; $s++)
+                        <span class="{{ $s <= floor($avgRating) ? 'star-filled' : 'star-empty' }}">★</span>
+                    @endfor
+                </div>
+                <div class="rating-big-count">dari {{ $totalReviews }} ulasan</div>
+            </div>
+
+            <div class="rating-divider"></div>
+
+            {{-- Bar breakdown --}}
+            <div class="rating-bars">
+                @foreach([5,4,3,2,1] as $bintang)
+                @php $pct = $totalReviews > 0 ? round(($bintangCount[$bintang] / $totalReviews) * 100) : 0; @endphp
+                <div class="rating-bar-row">
+                    <div class="rating-bar-label">{{ $bintang }}</div>
+                    <span class="rating-bar-star">★</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width: {{ $pct }}%;"></div>
+                    </div>
+                    <div class="rating-bar-count">{{ $bintangCount[$bintang] }}</div>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="rating-divider"></div>
+
+            {{-- Stats --}}
+            <div class="rating-stats">
+                <div class="rating-stat-item">
+                    <div class="rating-stat-val">{{ $totalReviews }}</div>
+                    <div class="rating-stat-lbl">Total Ulasan</div>
+                </div>
+                <div class="rating-stat-item">
+                    <div class="rating-stat-val">{{ $bintangCount[5] }}</div>
+                    <div class="rating-stat-lbl">Bintang 5 ⭐</div>
+                </div>
+                <div class="rating-stat-item">
+                    <div class="rating-stat-val">{{ round(($bintangCount[5] + $bintangCount[4]) / max($totalReviews, 1) * 100) }}%</div>
+                    <div class="rating-stat-lbl">Kepuasan</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ══ Filter ══ --}}
+        <div class="ul-filter-row">
+            <button class="ul-filter-btn active" onclick="filterUlasan(this, 'all')">Semua</button>
+            <button class="ul-filter-btn" onclick="filterUlasan(this, '5')">⭐⭐⭐⭐⭐ 5 Bintang</button>
+            <button class="ul-filter-btn" onclick="filterUlasan(this, '4')">⭐⭐⭐⭐ 4 Bintang</button>
+            <button class="ul-filter-btn" onclick="filterUlasan(this, '3')">⭐⭐⭐ 3 Bintang ke bawah</button>
+        </div>
+
+        {{-- ══ Review List ══ --}}
+        <div class="ul-reviews-list" id="reviewList">
+
+            @if($hasReal)
+                @foreach($realReviews as $review)
+                @php
+                    $siswa   = $review->booking->student ?? null;
+                    $nama    = $siswa->name ?? 'Siswa';
+                    $words   = explode(' ', $nama);
+                    $inits   = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
+                    $colors  = ['#6366f1','#10b981','#ef4444','#8b5cf6','#f59e0b','#0ea5e9'];
+                    $color   = $colors[$review->id % count($colors)];
+                    $mapel   = $review->booking->schedule->subject->nama_mapel ?? '-';
+                    $tgl     = $review->created_at ? \Carbon\Carbon::parse($review->created_at)->format('d M Y') : '-';
+                    $rating  = $review->rating ?? 5;
+                @endphp
+                <div class="ul-review-card" data-rating="{{ $rating }}">
+                    <div class="ul-review-header">
+                        <div class="ul-reviewer-left">
+                            <div class="ul-reviewer-avatar" style="background: {{ $color }};">{{ $inits }}</div>
+                            <div>
+                                <div class="ul-reviewer-name">{{ $nama }}</div>
+                                <div class="ul-reviewer-meta">{{ $mapel }}</div>
+                            </div>
+                        </div>
+                        <div class="ul-review-right">
+                            <div class="ul-review-stars">
+                                @for($s = 1; $s <= 5; $s++)
+                                    <span class="ul-star {{ $s <= $rating ? '' : 'empty' }}">★</span>
+                                @endfor
+                            </div>
+                            <div class="ul-review-date">{{ $tgl }}</div>
+                        </div>
+                    </div>
+                    @if($review->komentar)
+                    <div class="ul-review-body">"{{ $review->komentar }}"</div>
+                    @endif
+                    <div class="ul-review-subject">
+                        <span class="ul-subject-pill">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                            {{ $mapel }}
+                        </span>
+                    </div>
+                    <button class="btn-balas">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
+                        </svg>
+                        Balas Ulasan
+                    </button>
+                </div>
+                @endforeach
+
+            @else
+                {{-- Demo reviews --}}
+                @foreach($demoReviews as $i => $review)
+                <div class="ul-review-card" data-rating="{{ $review['rating'] }}">
+                    <div class="ul-review-header">
+                        <div class="ul-reviewer-left">
+                            <div class="ul-reviewer-avatar" style="background: {{ $review['warna'] }};">{{ $review['inisial'] }}</div>
+                            <div>
+                                <div class="ul-reviewer-name">{{ $review['nama'] }}</div>
+                                <div class="ul-reviewer-meta">{{ $review['mapel'] }}</div>
+                            </div>
+                        </div>
+                        <div class="ul-review-right">
+                            <div class="ul-review-stars">
+                                @for($s = 1; $s <= 5; $s++)
+                                    <span class="ul-star {{ $s <= $review['rating'] ? '' : 'empty' }}">★</span>
+                                @endfor
+                            </div>
+                            <div class="ul-review-date">{{ $review['tanggal'] }}</div>
+                        </div>
+                    </div>
+
+                    <div class="ul-review-body">"{{ $review['komentar'] }}"</div>
+
+                    <div class="ul-review-subject">
+                        <span class="ul-subject-pill">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                            {{ $review['mapel'] }}
+                        </span>
+                    </div>
+
+                    {{-- Tutor reply hanya pada card pertama sebagai demo --}}
+                    @if($i === 0)
+                    <div class="ul-reply-box">
+                        <div class="ul-reply-label">💬 Balasan Anda</div>
+                        <div class="ul-reply-text">Terima kasih atas ulasannya, Sarah! Senang sekali bisa membantu. Semangat terus belajarnya ya! 😊</div>
+                    </div>
+                    @else
+                    <button class="btn-balas" onclick="alert('Fitur balas ulasan segera hadir!')">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
+                        </svg>
+                        Balas Ulasan
+                    </button>
+                    @endif
+                </div>
+                @endforeach
+            @endif
+
+        </div>{{-- end #reviewList --}}
+
+    </main>
+</div>
+
+<script>
+    function filterUlasan(btn, filter) {
+        // Toggle active button
+        document.querySelectorAll('.ul-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Filter cards
+        document.querySelectorAll('.ul-review-card').forEach(card => {
+            const rating = parseInt(card.dataset.rating);
+            let show = false;
+            if (filter === 'all')      show = true;
+            else if (filter === '5')   show = rating === 5;
+            else if (filter === '4')   show = rating === 4;
+            else if (filter === '3')   show = rating <= 3;
+            card.style.display = show ? '' : 'none';
+        });
+    }
+</script>
+</body>
+</html>

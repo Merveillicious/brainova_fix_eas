@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
@@ -30,7 +31,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $email)->first();
 
-        if ($user && $user->password === $password) {
+        if ($user && Hash::check($password, $user->password)) {
             $request->session()->put('user', [
                 'id'    => $user->id,
                 'name'  => $user->name,
@@ -78,7 +79,7 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => $name,
             'email'    => $email,
-            'password' => $password,
+            'password' => Hash::make($password),
             'role'     => $role,
         ]);
 
