@@ -11,17 +11,12 @@
     </style>
 </head>
 <body>
-    <div class="app-topbar">
-        <a href="{{ route('siswa.dashboard') }}" class="app-brand">
-            Brainova 
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
-              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
-            </svg>
-        </a>
-    </div>
-
-    <div class="cari-tutor-layout">
+<header class="app-topbar">
+    <a href="{{ route('siswa.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="cari-tutor-layout">
         <!-- Sidebar Filter -->
         <aside class="filter-sidebar">
             <div class="filter-card">
@@ -82,7 +77,7 @@
 
             @if(isset($tutors) && count($tutors) > 0)
                 @foreach($tutors as $tutor)
-                <div class="tutor-list-card">
+                <div class="tutor-list-card" style="cursor: pointer;" onclick="window.location.href='{{ route('siswa.tutor-profil', $tutor->id) }}'">
                     <div class="tutor-info-wrap">
                         <div class="tutor-avatar-wrap">
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" alt="Avatar">
@@ -111,7 +106,7 @@
             @endif
 
             <!-- Static UI representation matching the mockup if needed to fill space -->
-            <div class="tutor-list-card">
+            <div class="tutor-list-card" style="cursor: pointer;" onclick="window.location.href='#'">
                 <div class="tutor-info-wrap">
                     <div class="tutor-avatar-wrap">
                         <img src="https://ui-avatars.com/api/?name=Amanda+Putri&background=random" alt="Avatar">
@@ -136,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="tutor-list-card">
+            <div class="tutor-list-card" style="cursor: pointer;" onclick="window.location.href='#'">
                 <div class="tutor-info-wrap">
                     <div class="tutor-avatar-wrap">
                         <img src="https://ui-avatars.com/api/?name=David+Lim&background=random" alt="Avatar">

@@ -15,7 +15,7 @@
         /* ── Chat Wrapper ── */
         .chat-wrapper {
             display: flex;
-            height: 100vh;
+            height: calc(100vh - 70px);
             overflow: hidden;
         }
 
@@ -23,19 +23,19 @@
         .chat-contacts {
             width: 280px;
             flex-shrink: 0;
-            border-right: 1px solid #e5e7eb;
+            border-right: 2px solid #000;
             display: flex;
             flex-direction: column;
             background: #fff;
         }
         .chat-search-box {
             padding: 14px 16px;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
         .chat-search-input {
             width: 100%;
             padding: 10px 14px 10px 36px;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -76,7 +76,7 @@
             height: 44px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
         }
         .chat-contact-avatar.initials {
             display: flex;
@@ -131,7 +131,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 14px 20px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 2px solid #000;
             background: #fff;
             flex-shrink: 0;
         }
@@ -140,7 +140,7 @@
             width: 40px; height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
         }
         .chat-header-name {
             font-size: 15px;
@@ -164,7 +164,7 @@
         .chat-header-actions { display: flex; gap: 8px; align-items: center; }
         .chat-header-btn {
             width: 34px; height: 34px;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 8px;
             background: #fff;
             cursor: pointer;
@@ -214,7 +214,7 @@
             width: 30px; height: 30px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             flex-shrink: 0;
             align-self: flex-end;
         }
@@ -233,13 +233,13 @@
         }
         .chat-bubble.them {
             background: #fff;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-bottom-left-radius: 4px;
             box-shadow: 0 1px 4px rgba(0,0,0,.04);
         }
         .chat-bubble.me {
             background: #FBBF24;
-            border: 1px solid #f59e0b;
+            border: 2px solid #000;
             border-bottom-right-radius: 4px;
             color: #000;
         }
@@ -258,7 +258,7 @@
         /* Input Area */
         .chat-input-area {
             padding: 12px 16px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 2px solid #000;
             background: #fff;
             display: flex;
             align-items: center;
@@ -283,7 +283,7 @@
         .chat-input-field {
             flex: 1;
             padding: 10px 16px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 24px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -311,7 +311,7 @@
         .chat-send-btn {
             width: 40px; height: 40px;
             background: #FBBF24;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             cursor: pointer;
             display: flex;
@@ -332,6 +332,11 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('tutor.partials.sidebar')
@@ -535,7 +540,6 @@
                     <input class="chat-input-field" type="text" id="msgInput"
                            placeholder="Tulis pesan..."
                            onkeydown="if(event.key==='Enter') sendMessage()">
-                    <button class="chat-emoji-btn" title="Emoji">😊</button>
                     <button class="chat-send-btn" onclick="sendMessage()" title="Kirim">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

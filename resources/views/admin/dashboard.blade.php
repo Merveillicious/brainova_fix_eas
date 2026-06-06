@@ -7,18 +7,15 @@
     <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <span class="navbar-brand">Brainova</span>
-        <div class="navbar-right">
-            <span class="badge-role">Admin</span>
-            <form method="POST" action="{{ route('logout') }}" style="display:inline">
-                @csrf
-                <button type="submit" class="btn-logout">Log out</button>
-            </form>
-        </div>
-    </nav>
-
-    <div class="dashboard-wrapper">
+<header class="app-topbar">
+    <a href="/admin/dashboard" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="siswa-layout">
+    @include('admin.partials.sidebar')
+    
+    <main class="siswa-main">
         <h1 class="page-title">Dashboard Admin</h1>
         <p class="sub-text">Halo, {{ session('user.name') }}! Kelola platform Brainova dari sini.</p>
 
@@ -29,26 +26,11 @@
             <div class="alert-error">{{ session('error') }}</div>
         @endif
 
-        <div class="stat-grid">
+        <div class="stat-grid" style="margin-bottom: 32px;">
             <div class="stat-card"><div class="stat-number">{{ $totalSiswa }}</div><div class="stat-label">Total Siswa</div></div>
             <div class="stat-card"><div class="stat-number">{{ $totalTutor }}</div><div class="stat-label">Tutor Aktif</div></div>
             <div class="stat-card"><div class="stat-number">{{ $totalBooking }}</div><div class="stat-label">Total Booking</div></div>
             <div class="stat-card"><div class="stat-number">{{ $bookingPending }}</div><div class="stat-label">Booking Pending</div></div>
-        </div>
-
-        <div class="nav-links">
-            <a href="{{ route('admin.kelola-tutor') }}" class="nav-link">
-                Kelola Tutor
-                @if($tutorPending > 0)
-                    <span class="badge-count">{{ $tutorPending }}</span>
-                @endif
-            </a>
-            <a href="{{ route('admin.kelola-pembayaran') }}" class="nav-link">
-                Kelola Pembayaran
-                @if($paymentPending > 0)
-                    <span class="badge-count">{{ $paymentPending }}</span>
-                @endif
-            </a>
         </div>
 
         <div class="card">
@@ -66,6 +48,7 @@
                 <span class="info-value">Admin</span>
             </div>
         </div>
-    </div>
+    </main>
+</div>
 </body>
 </html>

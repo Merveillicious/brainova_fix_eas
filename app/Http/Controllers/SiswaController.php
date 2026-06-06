@@ -231,6 +231,14 @@ class SiswaController extends Controller
         return view('siswa.profil-tutor', compact('tutor', 'schedules'));
     }
 
+    public function checkout(Request $request)
+    {
+        $scheduleId = intval($request->input('schedule_id'));
+        $schedule = Schedule::with(['tutor.subject', 'subject'])->findOrFail($scheduleId);
+        
+        return view('siswa.checkout', compact('schedule'));
+    }
+
     public function booking(Request $request)
     {
         $userId      = session('user.id');
@@ -271,12 +279,29 @@ class SiswaController extends Controller
 
         Payment::create([
             'booking_id' => $b->id,
-            'jumlah'     => $schedule->tutor->tarif,
+            'jumlah'     => $schedule->tutor->tarif + 4000,
             'metode'     => $metode,
             'status'     => 'menunggu',
         ]);
 
-        return redirect()->route('siswa.dashboard')->with('success', 'Booking berhasil dibuat! Menunggu konfirmasi pembayaran.');
+        return redirect()->route('siswa.gateway', $b->id);
+    }
+
+    public function gateway($id)
+    {
+        $userId = session('user.id');
+        $student = Student::where('user_id', $userId)->first();
+
+        if (!$student) {
+            return redirect()->route('siswa.dashboard');
+        }
+        
+        $booking = Booking::with(['schedule.tutor', 'schedule.subject'])
+            ->where('id', $id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        return view('siswa.gateway', compact('booking'));
     }
 
     public function cancelBooking(Request $request)

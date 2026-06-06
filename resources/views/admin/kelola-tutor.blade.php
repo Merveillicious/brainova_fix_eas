@@ -7,19 +7,15 @@
     <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{{ route('admin.dashboard') }}" class="navbar-brand">Brainova</a>
-        <div class="navbar-right">
-            <span class="badge-role">Admin</span>
-            <form method="POST" action="{{ route('logout') }}" style="display:inline">
-                @csrf
-                <button type="submit" class="btn-logout">Log out</button>
-            </form>
-        </div>
-    </nav>
-
-    <div class="dashboard-wrapper" style="max-width:800px">
-        <a href="{{ route('admin.dashboard') }}" class="back-link">← Kembali ke Dashboard</a>
+<header class="app-topbar">
+    <a href="/admin/dashboard" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="siswa-layout">
+    @include('admin.partials.sidebar')
+    
+    <main class="siswa-main">
         <h1 class="page-title">Kelola Tutor</h1>
         <p class="sub-text">Approve atau tolak pendaftaran tutor.</p>
 
@@ -79,6 +75,7 @@
                 </div>
             @endforeach
         @endif
-    </div>
+    </main>
+</div>
 </body>
 </html>

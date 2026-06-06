@@ -28,7 +28,7 @@
             gap: 8px;
             padding: 11px 20px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
@@ -51,7 +51,7 @@
         }
         .pm-stat-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             padding: 22px 24px;
             position: relative;
@@ -95,7 +95,7 @@
         /* ── Chart Card ── */
         .pm-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 24px;
@@ -114,7 +114,7 @@
         .btn-period {
             padding: 6px 14px;
             background: #f3f4f6;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
@@ -159,13 +159,13 @@
             color: #9ca3af;
             text-align: left;
             padding: 0 12px 12px;
-            border-bottom: 1.5px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
         .pm-table td {
             padding: 14px 12px;
             font-size: 14px;
             color: #374151;
-            border-bottom: 1px solid #f9fafb;
+            border-bottom: 2px solid #000;
             vertical-align: middle;
         }
         .pm-table tr:last-child td { border-bottom: none; }
@@ -215,11 +215,16 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('tutor.partials.sidebar')
 
-    <main class="siswa-main" style="max-height: 100vh; overflow-y: auto;">
+    <main class="siswa-main" style="max-height: calc(100vh - 70px); overflow-y: auto;">
 
         {{-- Header --}}
         <div class="pm-header">
@@ -261,7 +266,6 @@
             <div class="pm-stat-card">
                 <div class="pm-stat-top">
                     <div class="pm-stat-label">Total Pendapatan</div>
-                    <div class="pm-stat-icon">📈</div>
                 </div>
                 <div class="pm-stat-value">Rp {{ $totalPendapatan > 0 ? number_format($totalPendapatan, 0, ',', '.') : '24.500.000' }}</div>
                 <div class="pm-stat-meta positive">⬆ +12% dari bulan lalu</div>
@@ -271,7 +275,6 @@
             <div class="pm-stat-card">
                 <div class="pm-stat-top">
                     <div class="pm-stat-label">Bulan Ini</div>
-                    <div class="pm-stat-icon">📅</div>
                 </div>
                 <div class="pm-stat-value">Rp {{ $bulanIni > 0 ? number_format($bulanIni, 0, ',', '.') : '4.200.000' }}</div>
                 <div class="pm-stat-meta">{{ now()->translatedFormat('F Y') ?: $bulanLabel }}</div>
@@ -281,7 +284,6 @@
             <div class="pm-stat-card">
                 <div class="pm-stat-top">
                     <div class="pm-stat-label">Saldo Tersedia</div>
-                    <div class="pm-stat-icon">🐷</div>
                 </div>
                 <div class="pm-stat-value">Rp {{ number_format($saldoTersedia, 0, ',', '.') }}</div>
                 <div class="pm-stat-meta">Siap ditarik</div>

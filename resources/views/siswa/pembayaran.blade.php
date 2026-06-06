@@ -18,7 +18,7 @@
         }
         .pb-summary-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 14px;
             padding: 20px 24px;
             display: flex;
@@ -45,7 +45,7 @@
         /* ── Table Card ── */
         .pb-table-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 14px;
             overflow: hidden;
         }
@@ -54,7 +54,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px 16px;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
             background: #fffdf5;
         }
         .pb-table-title {
@@ -70,7 +70,7 @@
         }
         .pb-filter-select {
             padding: 7px 12px;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 13px;
             font-family: 'Inter', sans-serif;
@@ -95,13 +95,13 @@
             text-transform: uppercase;
             letter-spacing: .06em;
             text-align: left;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
         .pb-table td {
             padding: 18px 24px;
             font-size: 14px;
             color: #111;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
             vertical-align: middle;
         }
         .pb-table tbody tr:last-child td { border-bottom: none; }
@@ -112,7 +112,7 @@
         .pb-desc-avatar {
             width: 36px; height: 36px;
             border-radius: 50%;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -141,8 +141,8 @@
             font-size: 11px;
             font-weight: 700;
         }
-        .pb-metode-transfer { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-        .pb-metode-ewallet  { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .pb-metode-transfer { background: #eff6ff; color: #1d4ed8; border: 2px solid #000; }
+        .pb-metode-ewallet  { background: #f0fdf4; color: #15803d; border: 2px solid #000; }
 
         /* status badge */
         .pb-status {
@@ -171,6 +171,11 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('siswa.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('siswa.partials.sidebar')

@@ -35,7 +35,7 @@
         }
         .ul-count-badge {
             background: #f3f4f6;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 20px;
             padding: 3px 12px;
             font-size: 12px;
@@ -46,7 +46,7 @@
         /* ── Perlu Dinilai card ── */
         .ul-pending-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 14px;
             padding: 16px 20px;
             display: flex;
@@ -62,7 +62,7 @@
         .ul-pending-avatar {
             width: 48px; height: 48px;
             border-radius: 50%;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -84,7 +84,7 @@
         .btn-beri-ulasan {
             padding: 9px 18px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
@@ -100,7 +100,7 @@
         /* ── Empty state ── */
         .ul-empty {
             background: #fff;
-            border: 1.5px dashed #e5e7eb;
+            border: 2px dashed #000;
             border-radius: 14px;
             text-align: center;
             padding: 48px 24px;
@@ -113,7 +113,7 @@
         /* ── Riwayat Ulasan card ── */
         .ul-review-card {
             background: #fdf8ef;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
@@ -215,7 +215,7 @@
         .ul-textarea {
             width: 100%;
             padding: 12px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -236,7 +236,7 @@
             flex: 1;
             padding: 11px;
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
@@ -250,7 +250,7 @@
             flex: 1;
             padding: 11px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
@@ -263,6 +263,11 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('siswa.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('siswa.partials.sidebar')

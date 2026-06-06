@@ -16,7 +16,7 @@
         /* ── Section ── */
         .pg-section {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             padding: 28px 32px;
             margin-bottom: 24px;
@@ -27,7 +27,7 @@
             color: #000;
             margin-bottom: 20px;
             padding-bottom: 14px;
-            border-bottom: 1.5px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
 
         /* ── Avatar row ── */
@@ -41,12 +41,12 @@
             width: 72px; height: 72px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #000;
         }
         .btn-ubah-foto {
             padding: 8px 18px;
             background: #fff;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
@@ -73,7 +73,7 @@
         .pg-input {
             width: 100%;
             padding: 12px 14px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -98,7 +98,7 @@
         .btn-tambah-mapel {
             padding: 12px 18px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 700;
@@ -151,7 +151,7 @@
             gap: 8px;
             padding: 10px 18px;
             background: #fff;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
@@ -169,7 +169,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 11px 14px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 10px;
             background: #fafafa;
             font-size: 13px;
@@ -195,7 +195,7 @@
         .btn-pg-primary {
             padding: 11px 24px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
@@ -211,13 +211,13 @@
             display: flex;
             justify-content: flex-end;
             padding-top: 16px;
-            border-top: 1.5px solid #f3f4f6;
+            border-top: 2px solid #000;
             margin-top: 8px;
         }
 
         /* ── Alerts ── */
-        .alert-success { background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;font-size:14px;color:#166534;margin-bottom:20px; }
-        .alert-error   { background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;margin-bottom:20px; }
+        .alert-success { background:#f0fdf4;border: 2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#166534;margin-bottom:20px; }
+        .alert-error   { background:#fef2f2;border: 2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;margin-bottom:20px; }
 
         @media (max-width: 640px) {
             .pg-form-grid { grid-template-columns: 1fr; }
@@ -227,12 +227,17 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('tutor.partials.sidebar')
 
-    <main class="siswa-main" style="max-height: 100vh; overflow-y: auto;">
-        <div style="max-width: 700px;">
+    <main class="siswa-main" style="max-height: calc(100vh - 70px); overflow-y: auto;">
+        <div>
 
             {{-- Alerts --}}
             @if(session('success'))

@@ -16,7 +16,7 @@
         /* ── Rating Summary Card ── */
         .rating-summary {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             padding: 28px 32px;
             margin-bottom: 24px;
@@ -108,7 +108,7 @@
         }
         .ul-filter-btn {
             padding: 8px 16px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
@@ -130,7 +130,7 @@
 
         .ul-review-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 14px;
             padding: 20px 22px;
             transition: box-shadow .2s, border-color .2s;
@@ -208,7 +208,7 @@
         .ul-reply-box {
             margin-top: 14px;
             background: #fff8e6;
-            border: 1.5px solid #fde68a;
+            border: 2px solid #000;
             border-radius: 10px;
             padding: 12px 16px;
         }
@@ -228,7 +228,7 @@
             gap: 6px;
             padding: 7px 14px;
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
@@ -243,7 +243,7 @@
         /* Empty state */
         .ul-empty {
             background: #fff;
-            border: 1.5px dashed #e5e7eb;
+            border: 2px dashed #000;
             border-radius: 14px;
             text-align: center;
             padding: 60px 24px;
@@ -253,8 +253,8 @@
         .ul-empty-sub   { font-size: 13px; color: #9ca3af; }
 
         /* Alert */
-        .alert-success { background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;font-size:14px;color:#166534;margin-bottom:20px; }
-        .alert-error   { background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;margin-bottom:20px; }
+        .alert-success { background:#f0fdf4;border: 2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#166534;margin-bottom:20px; }
+        .alert-error   { background:#fef2f2;border: 2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;margin-bottom:20px; }
 
         @media (max-width: 768px) {
             .rating-summary { flex-direction: column; gap: 24px; }
@@ -263,11 +263,16 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('tutor.partials.sidebar')
 
-    <main class="siswa-main" style="max-height: 100vh; overflow-y: auto;">
+    <main class="siswa-main" style="max-height: calc(100vh - 70px); overflow-y: auto;">
 
         @if(session('success'))
             <div class="alert-success">{{ session('success') }}</div>
@@ -411,12 +416,7 @@
                             {{ $mapel }}
                         </span>
                     </div>
-                    <button class="btn-balas">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
-                        </svg>
-                        Balas Ulasan
-                    </button>
+
                 </div>
                 @endforeach
 
@@ -454,20 +454,7 @@
                         </span>
                     </div>
 
-                    {{-- Tutor reply hanya pada card pertama sebagai demo --}}
-                    @if($i === 0)
-                    <div class="ul-reply-box">
-                        <div class="ul-reply-label">💬 Balasan Anda</div>
-                        <div class="ul-reply-text">Terima kasih atas ulasannya, Sarah! Senang sekali bisa membantu. Semangat terus belajarnya ya! 😊</div>
-                    </div>
-                    @else
-                    <button class="btn-balas" onclick="alert('Fitur balas ulasan segera hadir!')">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
-                        </svg>
-                        Balas Ulasan
-                    </button>
-                    @endif
+
                 </div>
                 @endforeach
             @endif

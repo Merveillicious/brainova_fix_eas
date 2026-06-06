@@ -7,7 +7,12 @@
     <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
 </head>
 <body class="auth-body">
-    <div class="auth-container">
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="auth-container">
         <a href="{{ route('tutor.dashboard') }}" class="back-link">← Kembali ke Dashboard</a>
         <h1 class="auth-title">Edit Profil Tutor</h1>
 

@@ -6,23 +6,52 @@
     <title>Kelola Jadwal - Brainova</title>
     <meta name="description" content="Atur ketersediaan jadwal mengajar Anda dalam 7 hari ke depan di Brainova.">
     <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    <style>
+        .btn-primary {
+            padding: 11px 24px;
+            background: #FBBF24;
+            border: 2px solid #000;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .15s, transform .1s;
+        }
+        .btn-primary:hover { background: #f59e0b; transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        
+        .btn-secondary {
+            padding: 11px 24px;
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            transition: background .15s, transform .1s;
+        }
+        .btn-secondary:hover { background: #f3f4f6; transform: translateY(-1px); }
+        .btn-secondary:active { transform: translateY(0); }
+    </style>
 </head>
-<body style="background:#fafafa">
-    <nav class="navbar" style="position:sticky;top:0;z-index:100">
-        <a href="{{ route('tutor.dashboard') }}" class="navbar-brand">Brainova</a>
-        <div class="navbar-right">
-            <span class="badge-role">Tutor</span>
-            <form method="POST" action="{{ route('logout') }}" style="display:inline">
-                @csrf
-                <button type="submit" class="btn-logout">Log out</button>
-            </form>
-        </div>
-    </nav>
+<body>
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="siswa-layout">
+        @include('tutor.partials.sidebar')
 
-    <div class="page-wrapper">
+        <main class="siswa-main">
         <!-- Page Header -->
         <div class="page-header">
-            <a href="{{ route('tutor.dashboard') }}" class="back-link">← Kembali ke Dashboard</a>
             <h1>Ketersediaan Jadwal</h1>
             <p class="sub">Atur slot waktu mengajar Anda dalam <strong>7 hari ke depan</strong>
                 ({{ now()->format('d M') }} – {{ now()->addDays(7)->format('d M Y') }})</p>
@@ -181,15 +210,15 @@
                     $sisa        = max(0, $schedules->sum('kuota') - $totalBooked);
                 @endphp
                 <div style="display:flex;gap:12px;flex-wrap:wrap">
-                    <div style="flex:1;min-width:140px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:16px 20px">
+                    <div style="flex:1;min-width:140px;background:#fff;border:2px solid #000;border-radius:12px;padding:16px 20px">
                         <div style="font-size:28px;font-weight:800">{{ $totalSlots }}</div>
                         <div style="font-size:13px;color:#888;margin-top:2px">Total Slot Jadwal</div>
                     </div>
-                    <div style="flex:1;min-width:140px;background:#fffbeb;border:2px solid #FBBF24;border-radius:12px;padding:16px 20px">
+                    <div style="flex:1;min-width:140px;background:#fffbeb;border:2px solid #000;border-radius:12px;padding:16px 20px">
                         <div style="font-size:28px;font-weight:800">{{ $totalBooked }}</div>
                         <div style="font-size:13px;color:#888;margin-top:2px">Total Booking Aktif</div>
                     </div>
-                    <div style="flex:1;min-width:140px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:16px 20px">
+                    <div style="flex:1;min-width:140px;background:#fff;border:2px solid #000;border-radius:12px;padding:16px 20px">
                         <div style="font-size:28px;font-weight:800">{{ $sisa }}</div>
                         <div style="font-size:13px;color:#888;margin-top:2px">Sisa Kuota Tersedia</div>
                     </div>
@@ -197,6 +226,7 @@
             </div>
 
         @endif
+        </main>
     </div>
 
     <!-- Delete Modal -->

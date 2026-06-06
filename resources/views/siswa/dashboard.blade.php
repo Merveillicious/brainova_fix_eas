@@ -11,7 +11,12 @@
     </style>
 </head>
 <body>
-    <div class="siswa-layout">
+<header class="app-topbar">
+    <a href="{{ route('siswa.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="siswa-layout">
         @include('siswa.partials.sidebar')
 
         <!-- Main Content (Cari Tutor Only) -->
@@ -77,7 +82,7 @@
 
                     @if(isset($tutors) && count($tutors) > 0)
                         @foreach($tutors as $tutor)
-                        <div class="tutor-list-card" style="padding: 16px; margin-bottom: 12px;">
+                        <div class="tutor-list-card" style="padding: 16px; margin-bottom: 12px; cursor: pointer;" onclick="window.location.href='{{ route('siswa.tutor-profil', $tutor->id) }}'">
                             <div class="tutor-info-wrap" style="gap: 16px;">
                                 <div class="tutor-avatar-wrap" style="width: 56px; height: 56px;">
                                     <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" alt="Avatar">

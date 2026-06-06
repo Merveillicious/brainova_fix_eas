@@ -11,7 +11,12 @@
     </style>
 </head>
 <body>
-    <div class="siswa-layout">
+<header class="app-topbar">
+    <a href="{{ route('tutor.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
+<div class="siswa-layout">
         @include('tutor.partials.sidebar')
 
         <main class="siswa-main">

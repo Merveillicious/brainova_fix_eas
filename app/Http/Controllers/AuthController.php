@@ -64,10 +64,16 @@ class AuthController extends Controller
         $regType  = $request->input('reg_type', 'siswa');
         $name     = trim($request->input('name', ''));
         $email    = trim($request->input('email', ''));
+        $phone    = trim($request->input('phone', ''));
         $password = $request->input('password', '');
+        $password_confirmation = $request->input('password_confirmation', '');
 
         if (empty($name) || empty($email) || empty($password)) {
-            return back()->with('error', 'Semua field harus diisi.')->with('tab', $regType);
+            return back()->with('error', 'Semua field wajib harus diisi.')->with('tab', $regType);
+        }
+
+        if ($password !== $password_confirmation) {
+            return back()->with('error', 'Konfirmasi password tidak cocok.')->with('tab', $regType);
         }
 
         if (User::where('email', $email)->exists()) {
@@ -79,6 +85,7 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => $name,
             'email'    => $email,
+            'phone'    => $phone,
             'password' => Hash::make($password),
             'role'     => $role,
         ]);

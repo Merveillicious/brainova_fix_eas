@@ -44,17 +44,30 @@
                     <input type="hidden" name="reg_type" value="siswa">
                     <div class="form-group">
                         <label for="name_siswa">Nama Lengkap</label>
-                        <input type="text" id="name_siswa" name="name" class="input-field" placeholder="Nama Lengkap" required>
+                        <input type="text" id="name_siswa" name="name" class="input-field" placeholder="Nama lengkap" required>
                     </div>
                     <div class="form-group">
                         <label for="email_siswa">Email</label>
-                        <input type="email" id="email_siswa" name="email" class="input-field" placeholder="Email" required>
+                        <input type="email" id="email_siswa" name="email" class="input-field" placeholder="Email kamu" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_siswa">Nomor Hp</label>
+                        <input type="text" id="phone_siswa" name="phone" class="input-field" placeholder="08xx-xxxx-xxxx">
                     </div>
                     <div class="form-group">
                         <label for="password_siswa">Password</label>
                         <div class="password-box">
-                            <input type="password" id="password_siswa" name="password" class="input-field" placeholder="Password" required>
+                            <input type="password" id="password_siswa" name="password" class="input-field" placeholder="Minimal 8 karakter" required>
                             <button type="button" class="eye-icon" onclick="togglePass('password_siswa', this)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_confirmation_siswa">Konfirmasi Password</label>
+                        <div class="password-box">
+                            <input type="password" id="password_confirmation_siswa" name="password_confirmation" class="input-field" placeholder="Ulangi password" required>
+                            <button type="button" class="eye-icon" onclick="togglePass('password_confirmation_siswa', this)">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
@@ -96,22 +109,35 @@
                     <div id="tutor-step-1">
                         <div class="form-group">
                             <label for="name_tutor">Nama Lengkap</label>
-                            <input type="text" id="name_tutor" name="name" class="input-field" placeholder="Nama Lengkap" required>
+                            <input type="text" id="name_tutor" name="name" class="input-field" placeholder="Nama lengkap" required>
                         </div>
                         <div class="form-group">
                             <label for="email_tutor">Email</label>
-                            <input type="email" id="email_tutor" name="email" class="input-field" placeholder="Email" required>
+                            <input type="email" id="email_tutor" name="email" class="input-field" placeholder="Email kamu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_tutor">Nomor Hp</label>
+                            <input type="text" id="phone_tutor" name="phone" class="input-field" placeholder="08xx-xxxx-xxxx">
                         </div>
                         <div class="form-group">
                             <label for="password_tutor">Password</label>
                             <div class="password-box">
-                                <input type="password" id="password_tutor" name="password" class="input-field" placeholder="Password" required>
+                                <input type="password" id="password_tutor" name="password" class="input-field" placeholder="Minimal 8 karakter" required>
                                 <button type="button" class="eye-icon" onclick="togglePass('password_tutor', this)">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                 </button>
                             </div>
                         </div>
-                        <button type="button" class="btn-submit" onclick="nextTutorStep(2)">Lanjut</button>
+                        <div class="form-group">
+                            <label for="password_confirmation_tutor">Konfirmasi Password</label>
+                            <div class="password-box">
+                                <input type="password" id="password_confirmation_tutor" name="password_confirmation" class="input-field" placeholder="Ulangi password" required>
+                                <button type="button" class="eye-icon" onclick="togglePass('password_confirmation_tutor', this)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-submit" onclick="nextTutorStep(2)">Sign Up sebagai Tutor</button>
                     </div>
 
                     <!-- Step 2: Profil Tutor -->
@@ -148,7 +174,7 @@
 
                             <div class="form-group">
                                 <label>Tingkat Pendidikan</label>
-                                <input type="text" class="input-field" placeholder="Misalnya SD, SMP, SMA">
+                                <input type="text" id="pendidikan_tutor" class="input-field" placeholder="Misalnya SD, SMP, SMA">
                             </div>
 
                             <div class="form-group">
@@ -185,7 +211,7 @@
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                                         Atau tempel link video (YouTube)
                                     </div>
-                                    <input type="text" class="input-field" placeholder="Link Video Youtube">
+                                    <input type="text" id="video_tutor" class="input-field" placeholder="Link Video Youtube">
                                 </div>
                                 <div class="col-right">
                                     <h3 class="req-title">Persyaratan Video</h3>
@@ -239,13 +265,12 @@
                             <div class="char-count" style="position: static; text-align: left; margin-bottom: 16px;">Tarif dalam Rupiah (IDR)</div>
 
                             <div class="info-box">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                                 <div>Tutor yang mengikuti rekomendasi tarif kami memiliki peluang <strong>40% lebih tinggi</strong> mendapatkan siswa pertama dalam seminggu setelah disetujui.</div>
                             </div>
                         </div>
                         <div class="step-actions">
                             <button type="button" class="btn-back" onclick="prevTutorStep(3)">← Kembali</button>
-                            <button type="submit" class="btn-next">Selesai Registrasi →</button>
+                            <button type="button" class="btn-next" onclick="validateStep4AndSubmit()">Selesai Registrasi →</button>
                         </div>
                     </div>
                 </form>
@@ -276,6 +301,37 @@
 
         // Multi-step logic
         function nextTutorStep(step) {
+            if (step === 2) {
+                const name = document.getElementById('name_tutor').value;
+                const email = document.getElementById('email_tutor').value;
+                const pass = document.getElementById('password_tutor').value;
+                const confirm = document.getElementById('password_confirmation_tutor').value;
+                
+                if (!name || !email || !pass || !confirm) {
+                    alert('Mohon isi semua field dasar (Nama, Email, Password) terlebih dahulu.');
+                    return;
+                }
+                if (pass !== confirm) {
+                    alert('Password dan Konfirmasi Password tidak cocok!');
+                    return;
+                }
+            } else if (step === 3) {
+                const pendidikan = document.getElementById('pendidikan_tutor').value;
+                const bio = document.getElementById('bio').value;
+                
+                if (!pendidikan || !bio) {
+                    alert('Mohon lengkapi Tingkat Pendidikan dan Bio Singkat terlebih dahulu.');
+                    return;
+                }
+            } else if (step === 4) {
+                const video = document.getElementById('video_tutor').value;
+                
+                if (!video) {
+                    alert('Mohon tempelkan link video perkenalan terlebih dahulu.');
+                    return;
+                }
+            }
+
             // Hide all steps
             for(let i=1; i<=4; i++) {
                 document.getElementById('tutor-step-' + i).style.display = 'none';
@@ -297,7 +353,32 @@
         }
 
         function prevTutorStep(step) {
-            nextTutorStep(step);
+            // No validation when going back
+            for(let i=1; i<=4; i++) {
+                document.getElementById('tutor-step-' + i).style.display = 'none';
+            }
+            document.getElementById('tutor-step-' + step).style.display = 'block';
+            
+            if(step > 1) {
+                document.getElementById('auth-header-wrapper').style.display = 'none';
+                document.getElementById('main-container').classList.add('expanded');
+                document.getElementById('tutor-stepper').style.display = 'flex';
+                updateStepper(step);
+            } else {
+                document.getElementById('auth-header-wrapper').style.display = 'block';
+                document.getElementById('main-container').classList.remove('expanded');
+                document.getElementById('tutor-stepper').style.display = 'none';
+            }
+        }
+
+        function validateStep4AndSubmit() {
+            const tarif = document.getElementById('tarif').value;
+            if (!tarif) {
+                alert('Mohon tetapkan tarif kamu terlebih dahulu.');
+                return;
+            }
+            // Submit form
+            document.querySelector('#tab-tutor form').submit();
         }
 
         function updateStepper(step) {

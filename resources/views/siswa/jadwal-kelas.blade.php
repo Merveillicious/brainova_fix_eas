@@ -27,7 +27,7 @@
 
         .jk-card {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             padding: 20px;
             position: relative;
@@ -45,7 +45,7 @@
             justify-content: space-between;
             margin-bottom: 14px;
             padding-bottom: 14px;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
         .jk-card-icon-title {
             display: flex;
@@ -55,7 +55,7 @@
         .jk-icon-box {
             width: 36px;
             height: 36px;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -117,7 +117,7 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             object-fit: cover;
         }
         .jk-tutor-name {
@@ -150,7 +150,7 @@
             width: 100%;
             padding: 11px;
             background: #FBBF24;
-            border: 1.5px solid #000;
+            border: 2px solid #000;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
@@ -173,7 +173,7 @@
         /* ── Riwayat Table ── */
         .jk-table-wrap {
             background: #fff;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             border-radius: 16px;
             overflow: hidden;
         }
@@ -192,13 +192,13 @@
             text-transform: uppercase;
             letter-spacing: .06em;
             text-align: left;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
         }
         .jk-table td {
             padding: 16px 20px;
             font-size: 14px;
             color: #000;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 2px solid #000;
             vertical-align: middle;
         }
         .jk-table tbody tr:last-child td { border-bottom: none; }
@@ -213,7 +213,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 1.5px solid #e5e7eb;
+            border: 2px solid #000;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -227,8 +227,8 @@
             font-size: 11px;
             font-weight: 700;
         }
-        .jk-tipe-privat { background: #f3f4f6; color: #555; border: 1px solid #e5e7eb; }
-        .jk-tipe-dynamic { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+        .jk-tipe-privat { background: #f3f4f6; color: #555; border: 2px solid #000; }
+        .jk-tipe-dynamic { background: #fff7ed; color: #c2410c; border: 2px solid #000; }
 
         /* status badge table */
         .jk-status {
@@ -257,6 +257,11 @@
     </style>
 </head>
 <body>
+<header class="app-topbar">
+    <a href="{{ route('siswa.dashboard') }}" class="app-brand">
+        Brainova
+    </a>
+</header>
 <div class="siswa-layout">
 
     @include('siswa.partials.sidebar')
@@ -277,7 +282,7 @@
         <h1 class="jk-section-title">Jadwal Kelas Saya</h1>
 
         @if($aktif->isEmpty())
-            <div class="jk-empty" style="background:#fff;border:1.5px dashed #e5e7eb;border-radius:16px;margin-bottom:40px;">
+            <div class="jk-empty" style="background:#fff;border: 2px dashed #000;border-radius:16px;margin-bottom:40px;">
                 <div class="jk-empty-icon">📅</div>
                 <p>Belum ada jadwal aktif</p>
                 <small>Pesan kelas tutor untuk mulai belajar!</small>
