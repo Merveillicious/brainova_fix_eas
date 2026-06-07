@@ -6,6 +6,8 @@ use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\Withdrawal;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -118,5 +120,49 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.kelola-pembayaran')->with('success', 'Status pembayaran berhasil diperbarui.');
+    }
+
+    public function kelolaPenarikan()
+    {
+        $withdrawals = Withdrawal::with('tutor')
+            ->orderByRaw("FIELD(status, 'pending', 'diproses', 'berhasil', 'ditolak')")
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        $pendingCount = Withdrawal::where('status', 'pending')->count();
+
+        return view('admin.kelola-penarikan', compact('withdrawals', 'pendingCount'));
+    }
+
+    public function updateWithdrawal(Request $request)
+    {
+        $id     = $request->input('withdrawal_id');
+        $status = $request->input('status');
+        $catatan = $request->input('catatan');
+
+        if (!in_array($status, ['diproses', 'berhasil', 'ditolak'])) {
+            return back()->with('error', 'Status tidak valid.');
+        }
+
+        $withdrawal = Withdrawal::find($id);
+        if (!$withdrawal) {
+            return back()->with('error', 'Data penarikan tidak ditemukan.');
+        }
+
+        $withdrawal->status = $status;
+        if ($catatan) $withdrawal->catatan = $catatan;
+        if ($status === 'berhasil' || $status === 'diproses') {
+            $withdrawal->processed_at = now();
+        }
+        $withdrawal->save();
+
+        $label = match($status) {
+            'diproses' => 'sedang diproses',
+            'berhasil' => 'berhasil disetujui',
+            'ditolak'  => 'ditolak',
+            default    => $status,
+        };
+
+        return back()->with('success', "Penarikan Rp " . number_format($withdrawal->jumlah, 0, ',', '.') . " $label.");
     }
 }

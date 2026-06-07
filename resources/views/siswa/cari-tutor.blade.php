@@ -138,13 +138,13 @@
             @if(($keyword ?? '') !== '')
                 <span class="filter-tag">
                     🔍 "{{ $keyword }}"
-                    <a href="{{ route('siswa.cari-tutor', array_merge(request()->except('keyword'))) }}">✕</a>
+                    <a href="{{ route('siswa.cari-tutor', request()->except('keyword')) }}">✕</a>
                 </span>
             @endif
             @if(($minHarga ?? 0) > 0 || (($maxHarga ?? 0) > 0 && ($maxHarga ?? 0) < 500000))
                 <span class="filter-tag">
                     💰 Rp {{ number_format($minHarga ?? 0, 0, ',', '.') }} — Rp {{ ($maxHarga ?? 0) > 0 ? number_format($maxHarga, 0, ',', '.') : '500.000+' }}
-                    <a href="{{ route('siswa.cari-tutor', array_merge(request()->except(['min_harga','max_harga']))) }}">✕</a>
+                    <a href="{{ route('siswa.cari-tutor', request()->except(['min_harga','max_harga'])) }}">✕</a>
                 </span>
             @endif
         </div>

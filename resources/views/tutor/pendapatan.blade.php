@@ -232,7 +232,7 @@
                 <div class="pm-title">Pemasukan</div>
                 <div class="pm-subtitle">Ringkasan pendapatan dan riwayat transaksi Anda.</div>
             </div>
-            <button class="btn-tarik-saldo" onclick="alert('Fitur tarik saldo segera hadir!')">
+            <button class="btn-tarik-saldo" onclick="document.getElementById('modalTarikSaldo').style.display='flex'">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <rect x="2" y="5" width="20" height="14" rx="2"/>
                     <line x1="2" y1="10" x2="22" y2="10"/>
@@ -240,6 +240,18 @@
                 Tarik Saldo
             </button>
         </div>
+
+        {{-- Alert Messages --}}
+        @if(session('success_tarik'))
+        <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:14px;color:#15803d;font-weight:600;">
+            ✅ {{ session('success_tarik') }}
+        </div>
+        @endif
+        @if(session('error_tarik'))
+        <div style="background:#fef2f2;border:2px solid #dc2626;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:14px;color:#dc2626;font-weight:600;">
+            ⚠️ {{ session('error_tarik') }}
+        </div>
+        @endif
 
         {{-- Stat Cards --}}
         @php
@@ -398,17 +410,22 @@
     </main>
 </div>
 
+@php
+    $safeLabels = isset($chartLabels) ? $chartLabels : ['Jan','Feb','Mar','Apr','Mei','Jun'];
+    $safeValues = isset($chartValues) ? $chartValues : [0,0,0,0,0,0];
+@endphp
 <script>
     /* ── Bar Chart ── */
     const ctx = document.getElementById('incomeChart').getContext('2d');
 
-    const chartLabels = @json(isset($chartLabels) ? $chartLabels : ['Jan','Feb','Mar','Apr','Mei','Jun']);
-    const chartValues = @json(isset($chartValues) ? $chartValues : [0,0,0,0,0,0]);
+    const chartLabels = @json($safeLabels);
+    const chartValues = @json($safeValues);
 
     const data6 = { labels: chartLabels, values: chartValues };
     const data12 = { labels: chartLabels, values: chartValues };
     let currentPeriod = 6;
 
+    @verbatim
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -428,7 +445,7 @@
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID'),
+                        label: function(ctx) { return 'Rp ' + ctx.parsed.y.toLocaleString('id-ID'); },
                     },
                     backgroundColor: '#000',
                     titleColor: '#fff',
@@ -442,7 +459,7 @@
                     grid: { display: false },
                     ticks: {
                         font: { size: 12, family: 'Inter', weight: '600' },
-                        color: ctx => ctx.tick.label === 'Okt' ? '#f59e0b' : '#9ca3af',
+                        color: '#9ca3af',
                     },
                     border: { display: false },
                 },
@@ -452,7 +469,7 @@
                     ticks: {
                         font: { size: 11, family: 'Inter' },
                         color: '#9ca3af',
-                        callback: val => {
+                        callback: function(val) {
                             if (val >= 1000000) return (val / 1000000) + 'M';
                             if (val >= 1000) return (val / 1000) + 'K';
                             return val;
@@ -485,6 +502,102 @@
         }
         chart.update();
     }
+    @endverbatim
 </script>
+
+{{-- ══ Modal Tarik Saldo ══ --}}
+<div id="modalTarikSaldo"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px;"
+     onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:#fff;border:2px solid #000;border-radius:16px;width:100%;max-width:480px;padding:32px;position:relative;">
+
+        {{-- Close --}}
+        <button onclick="document.getElementById('modalTarikSaldo').style.display='none'"
+                style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#666;">✕</button>
+
+        <h2 style="font-size:20px;font-weight:800;color:#000;margin:0 0 6px;">Tarik Saldo</h2>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 24px;">
+            Saldo tersedia: <strong style="color:#16a34a;">
+                @php
+                    $_saldo = $saldoTersedia ?? 0;
+                @endphp
+                Rp {{ number_format($_saldo, 0, ',', '.') }}
+            </strong>
+        </p>
+
+        <form method="POST" action="{{ route('tutor.saldo.tarik') }}">
+            @csrf
+
+            {{-- Jumlah --}}
+            <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:13px;font-weight:700;color:#000;margin-bottom:6px;">
+                    Jumlah Penarikan <span style="color:#ef4444;">*</span>
+                </label>
+                <div style="position:relative;">
+                    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;color:#374151;">Rp</span>
+                    <input type="number" name="jumlah" min="50000" max="{{ (int)($_saldo ?? 0) }}"
+                           placeholder="50.000"
+                           style="width:100%;padding:12px 12px 12px 40px;border:2px solid #000;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;box-sizing:border-box;"
+                           required>
+                </div>
+                <div style="font-size:11px;color:#9ca3af;margin-top:4px;">Minimum Rp 50.000</div>
+            </div>
+
+            {{-- Metode --}}
+            <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:13px;font-weight:700;color:#000;margin-bottom:6px;">
+                    Metode Penarikan <span style="color:#ef4444;">*</span>
+                </label>
+                <select name="metode" required
+                        style="width:100%;padding:12px;border:2px solid #000;border-radius:10px;font-size:14px;font-family:inherit;background:#fff;">
+                    <option value="transfer_bank">🏦 Transfer Bank</option>
+                    <option value="gopay">💚 GoPay</option>
+                    <option value="ovo">💜 OVO</option>
+                    <option value="dana">🔵 DANA</option>
+                </select>
+            </div>
+
+            {{-- Nomor Rekening / Akun --}}
+            <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:13px;font-weight:700;color:#000;margin-bottom:6px;">
+                    Nomor Rekening / Akun E-Wallet <span style="color:#ef4444;">*</span>
+                </label>
+                <input type="text" name="nomor_rekening" placeholder="Contoh: 1234567890"
+                       style="width:100%;padding:12px;border:2px solid #000;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"
+                       required>
+            </div>
+
+            {{-- Nama Pemilik --}}
+            <div style="margin-bottom:24px;">
+                <label style="display:block;font-size:13px;font-weight:700;color:#000;margin-bottom:6px;">
+                    Nama Pemilik Rekening <span style="color:#ef4444;">*</span>
+                </label>
+                <input type="text" name="nama_pemilik" placeholder="Sesuai nama di rekening"
+                       value="{{ session('user.name') }}"
+                       style="width:100%;padding:12px;border:2px solid #000;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"
+                       required>
+            </div>
+
+            {{-- Info --}}
+            <div style="background:#fffbeb;border:1.5px solid #FBBF24;border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:12px;color:#92400e;line-height:1.6;">
+                ⏱️ Proses penarikan membutuhkan <strong>1×24 jam kerja</strong>.<br>
+                📊 Saldo yang tersedia sudah dipotong biaya platform 15%.
+            </div>
+
+            <div style="display:flex;gap:12px;">
+                <button type="button"
+                        onclick="document.getElementById('modalTarikSaldo').style.display='none'"
+                        style="flex:1;padding:13px;border:2px solid #000;border-radius:10px;background:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+                    Batal
+                </button>
+                <button type="submit"
+                        style="flex:2;padding:13px;border:2px solid #000;border-radius:10px;background:#FBBF24;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+                    💸 Ajukan Penarikan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>

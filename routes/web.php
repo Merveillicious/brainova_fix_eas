@@ -41,6 +41,8 @@ Route::middleware(['brainova.auth:admin'])->prefix('admin')->name('admin.')->gro
     Route::get('/report/pdf-booking',     [ReportController::class, 'pdfBooking'])->name('report.pdf-booking');
     Route::get('/report/excel-booking',   [ReportController::class, 'excelBooking'])->name('report.excel-booking');
     Route::get('/report/excel-pembayaran',[ReportController::class, 'excelPembayaran'])->name('report.excel-pembayaran');
+    Route::get('/kelola-penarikan',       [AdminController::class, 'kelolaPenarikan'])->name('kelola-penarikan');
+    Route::post('/penarikan/update',      [AdminController::class, 'updateWithdrawal'])->name('penarikan.update');
 });
 
 // Siswa routes
@@ -82,4 +84,5 @@ Route::middleware(['brainova.auth:tutor'])->prefix('tutor')->name('tutor.')->gro
     Route::get('/pengaturan',      [TutorController::class, 'pengaturan'])->name('pengaturan');
     Route::post('/pengaturan/profil', [TutorController::class, 'updateProfilAkun'])->name('pengaturan.profil');
     Route::post('/pengaturan/sandi',  [TutorController::class, 'updateSandiAkun'])->name('pengaturan.sandi');
+    Route::post('/saldo/tarik',       [TutorController::class, 'tarikSaldo'])->name('saldo.tarik');
 });

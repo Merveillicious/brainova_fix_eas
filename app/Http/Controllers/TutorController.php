@@ -7,6 +7,9 @@ use App\Models\Tutor;
 use App\Models\Schedule;
 use App\Models\Booking;
 use App\Models\Subject;
+use App\Models\Payment;
+use App\Models\Withdrawal;
+use Illuminate\Support\Facades\DB;
 
 class TutorController extends Controller
 {
@@ -441,5 +444,50 @@ class TutorController extends Controller
         $user->update(['password' => \Illuminate\Support\Facades\Hash::make($sandiBaru)]);
 
         return back()->with('success_sandi', 'Kata sandi berhasil diperbarui!');
+    }
+
+    public function tarikSaldo(Request $request)
+    {
+        $userId = session('user.id');
+        $tutor  = Tutor::where('user_id', $userId)->first();
+
+        if (!$tutor) {
+            return back()->with('error', 'Data tutor tidak ditemukan.');
+        }
+
+        // Hitung saldo tersedia
+        $totalPendapatan = Booking::whereHas('schedule', fn($q) => $q->where('tutor_id', $tutor->id))
+            ->whereHas('payment', fn($q) => $q->where('status', 'berhasil'))
+            ->with('payment')
+            ->get()
+            ->sum(fn($b) => $b->payment->jumlah ?? 0);
+
+        $sudahDitarik = Withdrawal::where('tutor_id', $tutor->id)
+            ->whereIn('status', ['pending', 'diproses', 'berhasil'])
+            ->sum('jumlah');
+
+        $saldoTersedia = ($totalPendapatan * 0.85) - $sudahDitarik;
+
+        $jumlah = (int) $request->input('jumlah');
+
+        if ($jumlah < 50000) {
+            return back()->with('error_tarik', 'Minimum penarikan adalah Rp 50.000.');
+        }
+
+        if ($jumlah > $saldoTersedia) {
+            return back()->with('error_tarik', 'Saldo tidak mencukupi. Saldo tersedia: Rp ' . number_format($saldoTersedia, 0, ',', '.'));
+        }
+
+        Withdrawal::create([
+            'tutor_id'       => $tutor->id,
+            'jumlah'         => $jumlah,
+            'metode'         => $request->input('metode', 'transfer_bank'),
+            'nomor_rekening' => $request->input('nomor_rekening'),
+            'nama_pemilik'   => $request->input('nama_pemilik'),
+            'status'         => 'pending',
+            'catatan'        => $request->input('catatan'),
+        ]);
+
+        return back()->with('success_tarik', 'Permintaan penarikan Rp ' . number_format($jumlah, 0, ',', '.') . ' berhasil diajukan! Proses 1x24 jam.');
     }
 }

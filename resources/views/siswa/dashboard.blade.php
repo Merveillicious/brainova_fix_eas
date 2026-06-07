@@ -156,19 +156,19 @@
                     @if(($keyword ?? '') !== '')
                         <span class="filter-tag">
                             🔍 "{{ $keyword }}"
-                            <a href="{{ route('siswa.dashboard', array_merge(request()->except('keyword'))) }}">✕</a>
+                            <a href="{{ route('siswa.dashboard', request()->except('keyword')) }}">✕</a>
                         </span>
                     @endif
                     @if(!empty($subjectIds ?? []))
                         <span class="filter-tag">
                             📚 {{ $subjects->whereIn('id', $subjectIds)->pluck('nama_mapel')->join(', ') }}
-                            <a href="{{ route('siswa.dashboard', array_merge(request()->except('subject'))) }}">✕</a>
+                            <a href="{{ route('siswa.dashboard', request()->except('subject')) }}">✕</a>
                         </span>
                     @endif
                     @if(($minHarga ?? 0) > 0 || (($maxHarga ?? 0) > 0 && ($maxHarga ?? 0) < 500000))
                         <span class="filter-tag">
                             💰 Rp {{ number_format($minHarga ?? 0, 0, ',', '.') }} — {{ ($maxHarga ?? 0) > 0 && ($maxHarga ?? 0) < 500000 ? 'Rp '.number_format($maxHarga, 0, ',', '.') : '500rb+' }}
-                            <a href="{{ route('siswa.dashboard', array_merge(request()->except(['min_harga','max_harga']))) }}">✕</a>
+                            <a href="{{ route('siswa.dashboard', request()->except(['min_harga','max_harga'])) }}">✕</a>
                         </span>
                     @endif
                 </div>
