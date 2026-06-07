@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengaturan - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
 
@@ -318,7 +318,7 @@
                         {{-- Pre-fill with current subject --}}
                         @if($tutor && $tutor->subject)
                             <span class="pg-chip">
-                                {{ $tutor->subject->nama_mapel }}
+                                {{ $tutor->subject?->nama_mapel }}
                                 <button type="button" class="pg-chip-remove" onclick="hapusChip(this)">×</button>
                             </span>
                         @else

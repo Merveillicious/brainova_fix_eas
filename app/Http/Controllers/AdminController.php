@@ -17,10 +17,32 @@ class AdminController extends Controller
         $bookingPending  = Booking::where('status_booking', 'pending')->count();
         $tutorPending    = Tutor::where('status', 'pending')->count();
         $paymentPending  = Payment::where('status', 'menunggu')->count();
+        $totalPendapatan = Payment::where('status', 'berhasil')->sum('jumlah');
+
+        // Chart: booking per 6 bulan terakhir
+        $chartLabels = [];
+        $chartBooking = [];
+        $chartPendapatan = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $bulan = now()->subMonths($i);
+            $chartLabels[]     = $bulan->format('M Y');
+            $chartBooking[]    = Booking::whereYear('tanggal_booking', $bulan->year)
+                                        ->whereMonth('tanggal_booking', $bulan->month)->count();
+            $chartPendapatan[] = (int) Payment::where('status', 'berhasil')
+                                        ->whereYear('created_at', $bulan->year)
+                                        ->whereMonth('created_at', $bulan->month)->sum('jumlah');
+        }
+
+        // Chart: status pembayaran (pie)
+        $payBerhasil = Payment::where('status', 'berhasil')->count();
+        $payMenunggu = Payment::where('status', 'menunggu')->count();
+        $payGagal    = Payment::where('status', 'gagal')->count();
 
         return view('admin.dashboard', compact(
             'totalSiswa', 'totalTutor', 'totalBooking',
-            'bookingPending', 'tutorPending', 'paymentPending'
+            'bookingPending', 'tutorPending', 'paymentPending', 'totalPendapatan',
+            'chartLabels', 'chartBooking', 'chartPendapatan',
+            'payBerhasil', 'payMenunggu', 'payGagal'
         ));
     }
 

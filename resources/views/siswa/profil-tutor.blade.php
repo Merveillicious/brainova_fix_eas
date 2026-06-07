@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Tutor - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
     </style>
@@ -31,7 +31,7 @@
                     <div class="divider"></div>
                     <span>340 sesi</span>
                 </div>
-                <div class="profil-subject-pill">{{ $tutor->subject->nama_mapel ?? 'Umum' }}</div>
+                <div class="profil-subject-pill">{{ $tutor->subject?->nama_mapel ?? 'Umum' }}</div>
             </div>
 
             <!-- Tentang Saya -->
@@ -121,7 +121,7 @@
                     </div>
                 </div>
 
-                <div class="booking-subject">{{ $tutor->subject->nama_mapel ?? 'Matematika' }}</div>
+                <div class="booking-subject">{{ $tutor->subject?->nama_mapel ?? 'Matematika' }}</div>
 
                 <div class="popularity-badge">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c0 0-3 5-3 9a3 3 0 0 0 6 0c0-4-3-9-3-9z"/><path d="M14 16c0 1.1-.9 2-2 2s-2-.9-2-2"/></svg>

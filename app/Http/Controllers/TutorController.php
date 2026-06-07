@@ -272,29 +272,123 @@ class TutorController extends Controller
     {
         $userId = session('user.id');
         $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
-        return view('tutor.pendapatan', compact('tutor'));
+
+        $bookingData = collect();
+        $chartLabels = [];
+        $chartValues = [];
+        $totalPendapatan = 0;
+        $bulanIni = 0;
+
+        if ($tutor) {
+            $bookingData = Booking::whereHas('schedule', fn($q) => $q->where('tutor_id', $tutor->id))
+                ->with(['student', 'schedule.subject', 'payment'])
+                ->orderByDesc('tanggal_booking')
+                ->get();
+
+            $totalPendapatan = $bookingData->where('status_booking', 'selesai')
+                ->sum(fn($b) => $b->payment->jumlah ?? 0);
+
+            $bulanIni = $bookingData->where('status_booking', 'selesai')
+                ->filter(fn($b) => \Carbon\Carbon::parse($b->tanggal_booking)->isCurrentMonth())
+                ->sum(fn($b) => $b->payment->jumlah ?? 0);
+
+            // Data chart 6 bulan terakhir
+            for ($i = 5; $i >= 0; $i--) {
+                $bulan = now()->subMonths($i);
+                $chartLabels[] = $bulan->translatedFormat('M');
+                $chartValues[] = (int) $bookingData->where('status_booking', 'selesai')
+                    ->filter(fn($b) => \Carbon\Carbon::parse($b->tanggal_booking)->format('Y-m') === $bulan->format('Y-m'))
+                    ->sum(fn($b) => $b->payment->jumlah ?? 0);
+            }
+        }
+
+        return view('tutor.pendapatan', compact('tutor', 'bookingData', 'totalPendapatan', 'bulanIni', 'chartLabels', 'chartValues'));
     }
 
     public function ulasan()
     {
         $userId = session('user.id');
         $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
-        return view('tutor.ulasan', compact('tutor'));
+
+        $reviews = collect();
+        $avgRating = 0;
+        $totalReviews = 0;
+        $bintangCount = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+
+        if ($tutor) {
+            $reviews = \App\Models\Review::where('tutor_id', $tutor->id)
+                ->with(['booking.student', 'booking.schedule.subject'])
+                ->orderByDesc('created_at')
+                ->get();
+
+            $totalReviews = $reviews->count();
+            if ($totalReviews > 0) {
+                $avgRating = round($reviews->avg('rating'), 1);
+                foreach ($reviews as $r) {
+                    $bintangCount[$r->rating] = ($bintangCount[$r->rating] ?? 0) + 1;
+                }
+            }
+        }
+
+        return view('tutor.ulasan', compact('tutor', 'reviews', 'avgRating', 'totalReviews', 'bintangCount'));
     }
 
-    public function pesan()
+    public function pesan(Request $request)
     {
-        $userId   = session('user.id');
-        $tutor    = Tutor::with('subject')->where('user_id', $userId)->first();
-        $students = collect();
+        $userId = session('user.id');
+        $tutor  = Tutor::with('subject')->where('user_id', $userId)->first();
+
+        $students       = collect();
+        $messages       = collect();
+        $activeStudent  = null;
+        $activeStudentUserId = null;
 
         if ($tutor) {
             $students = \App\Models\Student::whereHas('bookings', function ($q) use ($tutor) {
                 $q->whereHas('schedule', fn($sq) => $sq->where('tutor_id', $tutor->id));
-            })->get();
+            })->with('user')->get();
+
+            $activeStudentId = $request->query('student');
+            if ($activeStudentId) {
+                $activeStudent = \App\Models\Student::with('user')->find($activeStudentId);
+                if ($activeStudent) {
+                    $activeStudentUserId = $activeStudent->user_id;
+                    $messages = \App\Models\Message::where(function ($q) use ($userId, $activeStudentUserId) {
+                        $q->where('sender_id', $userId)->where('receiver_id', $activeStudentUserId);
+                    })->orWhere(function ($q) use ($userId, $activeStudentUserId) {
+                        $q->where('sender_id', $activeStudentUserId)->where('receiver_id', $userId);
+                    })->orderBy('created_at')->get();
+
+                    \App\Models\Message::where('sender_id', $activeStudentUserId)
+                        ->where('receiver_id', $userId)
+                        ->where('is_read', false)
+                        ->update(['is_read' => true]);
+                }
+            }
         }
 
-        return view('tutor.pesan', compact('tutor', 'students'));
+        return view('tutor.pesan', compact('tutor', 'students', 'messages', 'activeStudent', 'activeStudentUserId'));
+    }
+
+    public function kirimPesan(Request $request)
+    {
+        $userId     = session('user.id');
+        $body       = trim($request->input('body', ''));
+        $receiverId = intval($request->input('receiver_id'));
+
+        if (empty($body) || !$receiverId) {
+            return back()->with('error', 'Pesan tidak boleh kosong.');
+        }
+
+        \App\Models\Message::create([
+            'sender_id'   => $userId,
+            'receiver_id' => $receiverId,
+            'body'        => $body,
+        ]);
+
+        $student = \App\Models\Student::where('user_id', $receiverId)->first();
+        return redirect()->route('tutor.pesan', ['student' => $student?->id ?? ''])
+            ->with('success', 'Pesan terkirim.');
     }
 
     public function pengaturan()
@@ -306,11 +400,46 @@ class TutorController extends Controller
 
     public function updateProfilAkun(Request $request)
     {
-        return redirect()->route('tutor.pengaturan')->with('success', 'Profil akun berhasil diperbarui.');
+        $userId = session('user.id');
+        $user   = \App\Models\User::find($userId);
+        if (!$user) return back()->with('error', 'User tidak ditemukan.');
+
+        $name  = trim($request->input('name', $user->name));
+        $phone = trim($request->input('phone', ''));
+
+        $user->update([
+            'name'  => $name,
+            'phone' => $phone,
+        ]);
+
+        // Update session dan tutor name
+        $request->session()->put('user.name', $name);
+        $tutor = Tutor::where('user_id', $userId)->first();
+        if ($tutor) $tutor->update(['name' => $name]);
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
     }
 
     public function updateSandiAkun(Request $request)
     {
-        return redirect()->route('tutor.pengaturan')->with('success', 'Kata sandi berhasil diperbarui.');
+        $userId     = session('user.id');
+        $user       = \App\Models\User::find($userId);
+        $sandiLama  = $request->input('sandi_lama', '');
+        $sandiBaru  = $request->input('sandi_baru', '');
+        $konfirmasi = $request->input('konfirmasi_sandi', '');
+
+        if (!\Illuminate\Support\Facades\Hash::check($sandiLama, $user->password)) {
+            return back()->with('error_sandi', 'Kata sandi saat ini salah.');
+        }
+        if (strlen($sandiBaru) < 8) {
+            return back()->with('error_sandi', 'Kata sandi baru minimal 8 karakter.');
+        }
+        if ($sandiBaru !== $konfirmasi) {
+            return back()->with('error_sandi', 'Konfirmasi kata sandi tidak cocok.');
+        }
+
+        $user->update(['password' => \Illuminate\Support\Facades\Hash::make($sandiBaru)]);
+
+        return back()->with('success_sandi', 'Kata sandi berhasil diperbarui!');
     }
 }

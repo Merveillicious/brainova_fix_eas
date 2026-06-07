@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gateway Pembayaran - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
         .gw-layout { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
@@ -167,14 +167,29 @@
         <div class="gw-footer-area">
             <div class="gw-secure-text">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Pembayaran aman & terenkripsi 256-bit SSL
+                Pembayaran aman &amp; terenkripsi 256-bit SSL
             </div>
-            <a href="{{ route('siswa.pembayaran') }}" style="text-decoration:none;">
-                <button type="button" class="gw-btn">
-                    Bayar dengan QRIS
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </button>
-            </a>
+
+            @if($booking->status_pembayaran === 'dibayar')
+                {{-- Sudah dibayar --}}
+                <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:14px;text-align:center;font-weight:700;color:#15803d;font-size:15px;">
+                    ✅ Pembayaran sudah dikonfirmasi
+                </div>
+                <div style="margin-top:12px;text-align:center;">
+                    <a href="{{ route('siswa.jadwal') }}" class="gw-btn" style="text-decoration:none;display:inline-flex;">
+                        Lihat Jadwal Kelas
+                    </a>
+                </div>
+            @else
+                {{-- Tombol konfirmasi bayar --}}
+                <form method="POST" action="{{ route('siswa.gateway.confirm', $booking->id) }}" id="confirmForm">
+                    @csrf
+                    <button type="submit" class="gw-btn">
+                        Bayar dengan QRIS
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
     
@@ -183,8 +198,8 @@
         <div class="gw-sum-header">
             <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" class="gw-sum-avatar" alt="Avatar">
             <div>
-                <div class="gw-sum-tutor">{{ $tutor->name }}</div>
-                <div class="gw-sum-sub">{{ $subject->nama_mapel ?? 'Matematika' }} · {{ \Carbon\Carbon::parse($booking->schedule->tanggal)->translatedFormat('j M Y') }}</div>
+                <div class="gw-sum-tutor">{{ $tutor?->name ?? '-' }}</div>
+                <div class="gw-sum-sub">{{ $subject?->nama_mapel ?? 'Matematika' }} · {{ \Carbon\Carbon::parse($booking->schedule?->tanggal)->translatedFormat('j M Y') }}</div>
             </div>
         </div>
         

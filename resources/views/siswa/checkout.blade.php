@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
         .checkout-layout { max-width: 900px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
@@ -45,6 +45,22 @@
         Brainova
     </a>
 </header>
+
+@if(session('error'))
+    <div style="max-width:900px;margin:16px auto 0;padding:0 20px;">
+        <div style="background:#fef2f2;border:2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#b91c1c;font-weight:600;">
+            ⚠️ {{ session('error') }}
+        </div>
+    </div>
+@endif
+@if(session('info'))
+    <div style="max-width:900px;margin:16px auto 0;padding:0 20px;">
+        <div style="background:#eff6ff;border:2px solid #000;border-radius:8px;padding:12px 16px;font-size:14px;color:#1d4ed8;font-weight:600;">
+            ℹ️ {{ session('info') }}
+        </div>
+    </div>
+@endif
+
 <div class="checkout-layout">
     <!-- Kiri -->
     <div>
@@ -65,7 +81,7 @@
             <table class="co-detail-table">
                 <tr>
                     <td class="co-detail-label">Mata Pelajaran</td>
-                    <td class="co-detail-value">{{ $schedule->subject->nama_mapel ?? 'Matematika' }}</td>
+                    <td class="co-detail-value">{{ $schedule->subject?->nama_mapel ?? 'Matematika' }}</td>
                 </tr>
                 <tr>
                     <td class="co-detail-label">Tipe</td>
@@ -105,7 +121,7 @@
                 <img src="https://ui-avatars.com/api/?name={{ urlencode($schedule->tutor->name) }}&background=random" class="co-summary-avatar" alt="Avatar">
                 <div>
                     <div class="co-summary-name">{{ explode(' ', trim($schedule->tutor->name))[0] }}</div>
-                    <div class="co-summary-sub">{{ $schedule->subject->nama_mapel ?? 'Matematika' }} · {{ \Carbon\Carbon::parse($schedule->tanggal)->translatedFormat('j M Y') }}</div>
+                    <div class="co-summary-sub">{{ $schedule->subject?->nama_mapel ?? 'Matematika' }} · {{ \Carbon\Carbon::parse($schedule->tanggal)->translatedFormat('j M Y') }}</div>
                 </div>
             </div>
             <div class="co-divider"></div>

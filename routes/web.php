@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\ReportController;
 
 // Landing page
 Route::get('/', function () {
@@ -35,6 +36,11 @@ Route::middleware(['brainova.auth:admin'])->prefix('admin')->name('admin.')->gro
     Route::post('/tutor/delete',       [AdminController::class, 'deleteTutor'])->name('tutor.delete');
     Route::get('/kelola-pembayaran',   [AdminController::class, 'kelolaPembayaran'])->name('kelola-pembayaran');
     Route::post('/pembayaran/update',  [AdminController::class, 'updatePembayaran'])->name('pembayaran.update');
+    // Report routes
+    Route::get('/report/pdf-pembayaran',  [ReportController::class, 'pdfPembayaran'])->name('report.pdf-pembayaran');
+    Route::get('/report/pdf-booking',     [ReportController::class, 'pdfBooking'])->name('report.pdf-booking');
+    Route::get('/report/excel-booking',   [ReportController::class, 'excelBooking'])->name('report.excel-booking');
+    Route::get('/report/excel-pembayaran',[ReportController::class, 'excelPembayaran'])->name('report.excel-pembayaran');
 });
 
 // Siswa routes
@@ -47,12 +53,14 @@ Route::middleware(['brainova.auth:siswa'])->prefix('siswa')->name('siswa.')->gro
     Route::get('/ulasan',        [SiswaController::class, 'ulasan'])->name('ulasan');
     Route::post('/ulasan/store', [SiswaController::class, 'storeUlasan'])->name('ulasan.store');
     Route::get('/pesan',         [SiswaController::class, 'pesan'])->name('pesan');
+    Route::post('/pesan/kirim',  [SiswaController::class, 'kirimPesan'])->name('pesan.kirim');
     Route::get('/pengaturan',    [SiswaController::class, 'pengaturan'])->name('pengaturan');
     Route::post('/pengaturan/profil',  [SiswaController::class, 'updateProfil'])->name('pengaturan.profil');
     Route::post('/pengaturan/sandi',   [SiswaController::class, 'updateSandi'])->name('pengaturan.sandi');
     Route::post('/checkout',    [SiswaController::class, 'checkout'])->name('checkout');
     Route::post('/booking',     [SiswaController::class, 'booking'])->name('booking');
     Route::get('/gateway/{id}', [SiswaController::class, 'gateway'])->name('gateway');
+    Route::post('/gateway/{id}/confirm', [SiswaController::class, 'confirmPayment'])->name('gateway.confirm');
     Route::post('/booking/cancel', [SiswaController::class, 'cancelBooking'])->name('booking.cancel');
 });
 
@@ -70,6 +78,7 @@ Route::middleware(['brainova.auth:tutor'])->prefix('tutor')->name('tutor.')->gro
     Route::get('/pendapatan',      [TutorController::class, 'pendapatan'])->name('pendapatan');
     Route::get('/ulasan',          [TutorController::class, 'ulasan'])->name('ulasan');
     Route::get('/pesan',           [TutorController::class, 'pesan'])->name('pesan');
+    Route::post('/pesan/kirim',    [TutorController::class, 'kirimPesan'])->name('pesan.kirim');
     Route::get('/pengaturan',      [TutorController::class, 'pengaturan'])->name('pengaturan');
     Route::post('/pengaturan/profil', [TutorController::class, 'updateProfilAkun'])->name('pengaturan.profil');
     Route::post('/pengaturan/sandi',  [TutorController::class, 'updateSandiAkun'])->name('pengaturan.sandi');

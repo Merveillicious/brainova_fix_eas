@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log in - Brainova</title>
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
 </head>
 <body class="auth-page">
     <div class="auth-topbar">
@@ -44,16 +44,17 @@
 
             <div class="auth-divider"><span>or</span></div>
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" id="loginForm" novalidate>
                 @csrf
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="input-field" placeholder="Email" value="{{ old('email') }}">
+                    <input type="email" id="email" name="email" class="input-field" placeholder="Masukkan email Anda" value="{{ old('email') }}" required autocomplete="email">
+                    <span class="field-error" id="emailErr" style="color:#b91c1c;font-size:12px;display:none;">Email tidak valid.</span>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-box">
-                        <input type="password" id="password" name="password" class="input-field" placeholder="Password">
+                        <input type="password" id="password" name="password" class="input-field" placeholder="Masukkan password" required minlength="6">
                         <button type="button" class="eye-icon" id="togglePassword">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
@@ -73,6 +74,7 @@
     </div>
 
     <script>
+        // Toggle password visibility
         const toggleBtn = document.getElementById('togglePassword');
         const passInput = document.getElementById('password');
         if (toggleBtn && passInput) {
@@ -82,6 +84,29 @@
                 toggleBtn.style.opacity = type === 'text' ? '0.5' : '1';
             });
         }
+
+        // Frontend validation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            let valid = true;
+            const email = document.getElementById('email');
+            const pass  = document.getElementById('password');
+            const emailErr = document.getElementById('emailErr');
+
+            // Reset
+            [email, pass].forEach(el => el.style.borderColor = '');
+            emailErr.style.display = 'none';
+
+            if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                email.style.borderColor = '#ef4444';
+                emailErr.style.display = 'block';
+                valid = false;
+            }
+            if (!pass.value || pass.value.length < 6) {
+                pass.style.borderColor = '#ef4444';
+                valid = false;
+            }
+            if (!valid) e.preventDefault();
+        });
     </script>
 </body>
 </html>

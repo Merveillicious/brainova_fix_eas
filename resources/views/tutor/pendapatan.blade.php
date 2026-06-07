@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemasukan - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
@@ -243,22 +243,10 @@
 
         {{-- Stat Cards --}}
         @php
-            $totalPendapatan = 0;
-            $bulanIni        = 0;
-            $saldoTersedia   = 1500000;
-            $bulanLabel      = 'Oktober 2023';
-
-            if (isset($tutor) && $tutor) {
-                // Hitung dari bookings yang selesai
-                $bookingsSelesai = \App\Models\Booking::whereHas('schedule', fn($q) => $q->where('tutor_id', $tutor->id))
-                    ->where('status_booking', 'selesai')
-                    ->with('payment')
-                    ->get();
-
-                $totalPendapatan = $bookingsSelesai->sum(fn($b) => $b->payment->jumlah ?? $tutor->tarif ?? 0);
-                $bulanIni        = $bookingsSelesai->filter(fn($b) => \Carbon\Carbon::parse($b->tanggal_booking)->isCurrentMonth())
-                    ->sum(fn($b) => $b->payment->jumlah ?? $tutor->tarif ?? 0);
-            }
+            if (!isset($totalPendapatan)) $totalPendapatan = 0;
+            if (!isset($bulanIni))        $bulanIni        = 0;
+            if (!isset($bookingData))     $bookingData     = collect();
+            $saldoTersedia = $totalPendapatan * 0.85; // Saldo setelah potongan platform
         @endphp
 
         <div class="pm-stat-grid">
@@ -267,7 +255,7 @@
                 <div class="pm-stat-top">
                     <div class="pm-stat-label">Total Pendapatan</div>
                 </div>
-                <div class="pm-stat-value">Rp {{ $totalPendapatan > 0 ? number_format($totalPendapatan, 0, ',', '.') : '24.500.000' }}</div>
+                <div class="pm-stat-value">Rp {{ $totalPendapatan > 0 ? number_format($totalPendapatan, 0, ',', '.') : '0' }}</div>
                 <div class="pm-stat-meta positive">⬆ +12% dari bulan lalu</div>
             </div>
 
@@ -276,7 +264,7 @@
                 <div class="pm-stat-top">
                     <div class="pm-stat-label">Bulan Ini</div>
                 </div>
-                <div class="pm-stat-value">Rp {{ $bulanIni > 0 ? number_format($bulanIni, 0, ',', '.') : '4.200.000' }}</div>
+                <div class="pm-stat-value">Rp {{ $bulanIni > 0 ? number_format($bulanIni, 0, ',', '.') : '0' }}</div>
                 <div class="pm-stat-meta">{{ now()->translatedFormat('F Y') ?: $bulanLabel }}</div>
             </div>
 
@@ -347,7 +335,7 @@
                                 $nama   = $b->student->name ?? 'Siswa';
                                 $words  = explode(' ', $nama);
                                 $inits  = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
-                                $mapel  = $b->schedule->subject->nama_mapel ?? '-';
+                                $mapel  = $b->schedule->subject?->nama_mapel ?? '-';
                                 $jumlah = $b->payment->jumlah ?? ($tutor->tarif ?? 0);
                                 $colors = ['#6366f1','#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6'];
                                 $color  = $colors[$b->id % count($colors)];
@@ -414,15 +402,11 @@
     /* ── Bar Chart ── */
     const ctx = document.getElementById('incomeChart').getContext('2d');
 
-    const data6 = {
-        labels: ['Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt'],
-        values: [1500000, 2800000, 2600000, 3400000, 3200000, 4200000],
-    };
-    const data12 = {
-        labels: ['Nov', 'Des', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt'],
-        values: [900000, 1100000, 1800000, 1500000, 2000000, 2200000, 1500000, 2800000, 2600000, 3400000, 3200000, 4200000],
-    };
+    const chartLabels = @json(isset($chartLabels) ? $chartLabels : ['Jan','Feb','Mar','Apr','Mei','Jun']);
+    const chartValues = @json(isset($chartValues) ? $chartValues : [0,0,0,0,0,0]);
 
+    const data6 = { labels: chartLabels, values: chartValues };
+    const data12 = { labels: chartLabels, values: chartValues };
     let currentPeriod = 6;
 
     const chart = new Chart(ctx, {

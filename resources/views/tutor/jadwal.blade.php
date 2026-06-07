@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Jadwal - Brainova</title>
     <meta name="description" content="Atur ketersediaan jadwal mengajar Anda dalam 7 hari ke depan di Brainova.">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         .btn-primary {
             padding: 11px 24px;
@@ -274,6 +274,62 @@
                 document.getElementById('formSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         @endif
+
+        // ── Validasi Form Jadwal ──────────────────────────────────────────────
+        (function() {
+            const form = document.querySelector('#formSection form');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                let valid  = true;
+                const tgl  = document.getElementById('tanggal');
+                const jMul = document.getElementById('jam_mulai');
+                const jSel = document.getElementById('jam_selesai');
+
+                // Reset
+                [tgl, jMul, jSel].forEach(el => { el.style.outline = ''; el.style.borderColor = ''; });
+                form.querySelectorAll('.jadwal-err').forEach(el => el.remove());
+
+                // Tanggal wajib diisi
+                if (!tgl.value) {
+                    markErr(tgl, 'Tanggal wajib dipilih.');
+                    valid = false;
+                }
+
+                // Jam mulai wajib
+                if (!jMul.value) {
+                    markErr(jMul, 'Jam mulai wajib diisi.');
+                    valid = false;
+                }
+
+                // Jam selesai harus setelah jam mulai
+                if (jMul.value && jSel.value && jSel.value <= jMul.value) {
+                    markErr(jSel, 'Jam selesai harus lebih dari jam mulai.');
+                    valid = false;
+                }
+
+                if (!valid) e.preventDefault();
+            });
+
+            function markErr(input, msg) {
+                input.style.borderColor = '#ef4444';
+                const span = document.createElement('span');
+                span.className = 'jadwal-err';
+                span.style.cssText = 'color:#ef4444;font-size:11px;font-weight:600;margin-top:4px;display:block;';
+                span.textContent = msg;
+                input.insertAdjacentElement('afterend', span);
+            }
+
+            // Hapus error saat input berubah
+            ['tanggal', 'jam_mulai', 'jam_selesai'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', function() {
+                    this.style.borderColor = '';
+                    const err = this.nextElementSibling;
+                    if (err && err.classList.contains('jadwal-err')) err.remove();
+                });
+            });
+        })();
     </script>
 </body>
 </html>

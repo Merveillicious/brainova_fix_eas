@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ulasan Saya - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; background: #fafafa; }
 
@@ -285,31 +285,14 @@
         <p class="ul-page-sub">Ulasan yang diberikan oleh siswa kepada Anda.</p>
 
         @php
-            /* ── Demo data ── */
-            $demoReviews = [
-                ['nama' => 'Sarah M.',      'inisial' => 'SM', 'warna' => '#6366f1', 'rating' => 5, 'komentar' => 'Tutor sangat sabar dan jelas dalam menjelaskan materi. Saya yang tadinya kesulitan memahami aljabar linear sekarang sudah bisa mengerjakan soalnya. Terima kasih banyak!', 'mapel' => 'Matematika SMA', 'tanggal' => '24 Okt 2023'],
-                ['nama' => 'Rizky P.',      'inisial' => 'RP', 'warna' => '#10b981', 'rating' => 5, 'komentar' => 'Materinya disampaikan dengan sangat sistematis. Tutor juga responsif menjawab pertanyaan di luar jam belajar.', 'mapel' => 'Fisika Dasar', 'tanggal' => '20 Okt 2023'],
-                ['nama' => 'Dewi Lestari',  'inisial' => 'DL', 'warna' => '#ef4444', 'rating' => 4, 'komentar' => 'Penjelasannya mudah dipahami, contoh soal yang diberikan juga sangat relevan. Semoga bisa lanjut belajar lagi!', 'mapel' => 'Persiapan UTBK', 'tanggal' => '15 Okt 2023'],
-                ['nama' => 'Andi Saputra',  'inisial' => 'AS', 'warna' => '#8b5cf6', 'rating' => 5, 'komentar' => 'Luar biasa! Tutor terbaik yang pernah saya temui. Nilai ujian saya naik drastis setelah les di sini.', 'mapel' => 'Kimia Dasar', 'tanggal' => '10 Okt 2023'],
-                ['nama' => 'Wulan Dewi',    'inisial' => 'WD', 'warna' => '#f59e0b', 'rating' => 4, 'komentar' => 'Cukup bagus, materinya tersampaikan dengan baik. Waktu belajarnya juga fleksibel.', 'mapel' => 'Matematika SMA', 'tanggal' => '5 Okt 2023'],
-                ['nama' => 'Budi Santoso',  'inisial' => 'BS', 'warna' => '#0ea5e9', 'rating' => 3, 'komentar' => 'Penjelasan sudah cukup, tapi kadang terlalu cepat. Perlu diperlambat sedikit supaya saya bisa menyimak.', 'mapel' => 'Fisika Dasar', 'tanggal' => '1 Okt 2023'],
-            ];
+            // Data dari controller (real dari DB, atau kosong jika belum ada)
+            $hasReal = isset($reviews) && $reviews->isNotEmpty();
+            $displayReviews = $hasReal ? $reviews : collect();
 
-            // Coba ambil dari DB
-            $realReviews = collect();
-            if (isset($tutor) && $tutor) {
-                $realReviews = \App\Models\Review::whereHas('booking.schedule', fn($q) => $q->where('tutor_id', $tutor->id))
-                    ->with(['booking.student', 'booking.schedule.subject'])
-                    ->orderByDesc('created_at')
-                    ->get();
-            }
-            $hasReal = $realReviews->isNotEmpty();
-
-            // Hitung statistik dari demo
-            $totalReviews   = count($demoReviews);
-            $avgRating      = round(array_sum(array_column($demoReviews, 'rating')) / $totalReviews, 1);
-            $bintangCount   = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-            foreach ($demoReviews as $r) { $bintangCount[$r['rating']]++; }
+            // Fallback jika belum ada data
+            if (!isset($avgRating))    $avgRating    = 0;
+            if (!isset($totalReviews)) $totalReviews = 0;
+            if (!isset($bintangCount)) $bintangCount = [5=>0,4=>0,3=>0,2=>0,1=>0];
         @endphp
 
         {{-- ══ Rating Summary ══ --}}
@@ -374,7 +357,7 @@
         <div class="ul-reviews-list" id="reviewList">
 
             @if($hasReal)
-                @foreach($realReviews as $review)
+                @foreach($displayReviews as $review)
                 @php
                     $siswa   = $review->booking->student ?? null;
                     $nama    = $siswa->name ?? 'Siswa';
@@ -382,7 +365,7 @@
                     $inits   = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
                     $colors  = ['#6366f1','#10b981','#ef4444','#8b5cf6','#f59e0b','#0ea5e9'];
                     $color   = $colors[$review->id % count($colors)];
-                    $mapel   = $review->booking->schedule->subject->nama_mapel ?? '-';
+                    $mapel   = $review->booking->schedule->subject?->nama_mapel ?? '-';
                     $tgl     = $review->created_at ? \Carbon\Carbon::parse($review->created_at)->format('d M Y') : '-';
                     $rating  = $review->rating ?? 5;
                 @endphp
@@ -408,55 +391,16 @@
                     <div class="ul-review-body">"{{ $review->komentar }}"</div>
                     @endif
                     <div class="ul-review-subject">
-                        <span class="ul-subject-pill">
-                            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                            </svg>
-                            {{ $mapel }}
-                        </span>
+                        <span class="ul-subject-pill">📚 {{ $mapel }}</span>
                     </div>
-
                 </div>
                 @endforeach
-
             @else
-                {{-- Demo reviews --}}
-                @foreach($demoReviews as $i => $review)
-                <div class="ul-review-card" data-rating="{{ $review['rating'] }}">
-                    <div class="ul-review-header">
-                        <div class="ul-reviewer-left">
-                            <div class="ul-reviewer-avatar" style="background: {{ $review['warna'] }};">{{ $review['inisial'] }}</div>
-                            <div>
-                                <div class="ul-reviewer-name">{{ $review['nama'] }}</div>
-                                <div class="ul-reviewer-meta">{{ $review['mapel'] }}</div>
-                            </div>
-                        </div>
-                        <div class="ul-review-right">
-                            <div class="ul-review-stars">
-                                @for($s = 1; $s <= 5; $s++)
-                                    <span class="ul-star {{ $s <= $review['rating'] ? '' : 'empty' }}">★</span>
-                                @endfor
-                            </div>
-                            <div class="ul-review-date">{{ $review['tanggal'] }}</div>
-                        </div>
-                    </div>
-
-                    <div class="ul-review-body">"{{ $review['komentar'] }}"</div>
-
-                    <div class="ul-review-subject">
-                        <span class="ul-subject-pill">
-                            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                            </svg>
-                            {{ $review['mapel'] }}
-                        </span>
-                    </div>
-
-
+                <div class="ul-empty">
+                    <div class="ul-empty-icon">⭐</div>
+                    <div class="ul-empty-title">Belum ada ulasan</div>
+                    <div class="ul-empty-sub">Ulasan dari siswa akan muncul di sini setelah sesi selesai.</div>
                 </div>
-                @endforeach
             @endif
 
         </div>{{-- end #reviewList --}}

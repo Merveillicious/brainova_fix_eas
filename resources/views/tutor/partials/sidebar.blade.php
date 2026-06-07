@@ -80,13 +80,24 @@
             </svg>
             Pengaturan
         </a>
-    </nav>
 
-    <form method="POST" action="{{ route('logout') }}" style="margin-top:auto; padding:24px;">
-        @csrf
-        <button type="submit" class="btn-outline"
-                style="width:100%; border-color:transparent; color:#ef4444; font-weight:600;">
-            Log out
-        </button>
-    </form>
+        {{-- Logout --}}
+        <div style="padding: 4px 16px; margin-top: 4px;">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                        style="width:100%; display:flex; align-items:center; gap:12px; padding:10px 12px; background:none; border:none; border-radius:10px; font-size:14px; font-weight:600; color:#ef4444; cursor:pointer; font-family:inherit; transition:background .15s;"
+                        onmouseover="this.style.background='#fef2f2'"
+                        onmouseout="this.style.background='none'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Log out
+                </button>
+            </form>
+        </div>
+    </nav>
 </aside>

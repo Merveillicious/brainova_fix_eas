@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Brainova</title>
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
 </head>
 <body class="auth-page">
     <div class="auth-topbar">
@@ -391,6 +391,76 @@
                 }
             }
         }
+
+        // ── Validasi Form Register Siswa ──────────────────────────────────────
+        document.querySelector('#tab-siswa form').addEventListener('submit', function(e) {
+            let valid = true;
+            const name  = document.getElementById('name_siswa');
+            const email = document.getElementById('email_siswa');
+            const pass  = document.getElementById('password_siswa');
+            const conf  = document.getElementById('password_confirmation_siswa');
+
+            // Reset border
+            [name, email, pass, conf].forEach(el => el.style.borderColor = '');
+
+            // Nama wajib
+            if (!name.value.trim() || name.value.trim().length < 2) {
+                name.style.borderColor = '#ef4444';
+                showErr(name, 'Nama minimal 2 karakter.');
+                valid = false;
+            }
+
+            // Email format
+            if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                email.style.borderColor = '#ef4444';
+                showErr(email, 'Format email tidak valid.');
+                valid = false;
+            }
+
+            // Password minimal 8
+            if (!pass.value || pass.value.length < 8) {
+                pass.style.borderColor = '#ef4444';
+                showErr(pass, 'Password minimal 8 karakter.');
+                valid = false;
+            }
+
+            // Konfirmasi password harus sama
+            if (conf.value !== pass.value) {
+                conf.style.borderColor = '#ef4444';
+                showErr(conf, 'Konfirmasi password tidak cocok.');
+                valid = false;
+            }
+
+            if (!valid) e.preventDefault();
+        });
+
+        // Helper: tampilkan pesan error kecil di bawah input
+        function showErr(input, msg) {
+            // Hapus pesan lama
+            const existing = input.parentNode.querySelector('.reg-err');
+            if (existing) existing.remove();
+
+            const span = document.createElement('span');
+            span.className = 'reg-err';
+            span.style.cssText = 'color:#ef4444;font-size:11px;font-weight:600;margin-top:3px;display:block;';
+            span.textContent = msg;
+
+            // Masukkan setelah input (atau setelah .password-box jika ada)
+            const box = input.closest('.password-box') || input;
+            box.insertAdjacentElement('afterend', span);
+        }
+
+        // Hapus error saat mengetik
+        ['name_siswa','email_siswa','password_siswa','password_confirmation_siswa'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', function() {
+                this.style.borderColor = '';
+                const err = this.closest('.password-box')
+                    ? this.closest('.password-box').nextElementSibling
+                    : this.nextElementSibling;
+                if (err && err.classList.contains('reg-err')) err.remove();
+            });
+        });
     </script>
 </body>
 </html>

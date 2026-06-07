@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Student;
 use App\Models\Booking;
 use App\Models\Schedule;
@@ -12,7 +13,7 @@ use App\Models\Review;
 
 class SiswaController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $userId  = session('user.id');
         $student = Student::where('user_id', $userId)->first();
@@ -25,9 +26,50 @@ class SiswaController extends Controller
                 ->get();
         }
 
-        $tutors = Tutor::with('subject')->where('status', 'aktif')->get();
+        // Filter params (sama seperti cariTutor)
+        $keyword    = trim($request->input('keyword', ''));
+        $minHarga   = (int) $request->input('min_harga', 0);
+        $maxHarga   = (int) $request->input('max_harga', 0);
+        $sort       = $request->input('sort', 'relevansi');
+        $subjectIds = $request->input('subject', []);
 
-        return view('siswa.dashboard', compact('bookings', 'student', 'tutors'));
+        $query = Tutor::with(['subject', 'reviews'])
+            ->where('status', 'aktif')
+            ->whereHas('schedules', fn($q) => $q->where('status', 'tersedia'));
+
+        if ($keyword !== '') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhereHas('subject', fn($sq) => $sq->where('nama_mapel', 'like', "%{$keyword}%"))
+                  ->orWhere('bio', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (!empty($subjectIds)) {
+            $query->whereIn('subject_id', $subjectIds);
+        }
+
+        if ($minHarga > 0) {
+            $query->where('tarif', '>=', $minHarga);
+        }
+        if ($maxHarga > 0 && $maxHarga < 500000) {
+            $query->where('tarif', '<=', $maxHarga);
+        }
+
+        $query = match ($sort) {
+            'harga_asc'  => $query->orderBy('tarif', 'asc'),
+            'harga_desc' => $query->orderBy('tarif', 'desc'),
+            'rating'     => $query->withCount('reviews')->orderByDesc('reviews_count'),
+            default      => $query->orderBy('name', 'asc'),
+        };
+
+        $tutors   = $query->get();
+        $subjects = \App\Models\Subject::orderBy('nama_mapel')->get();
+
+        return view('siswa.dashboard', compact(
+            'bookings', 'student', 'tutors', 'subjects',
+            'keyword', 'minHarga', 'maxHarga', 'sort', 'subjectIds'
+        ));
     }
 
     public function jadwalKelas()
@@ -61,29 +103,76 @@ class SiswaController extends Controller
             $payments = Payment::with(['booking.schedule.tutor', 'booking.schedule.subject'])
                 ->whereHas('booking', fn($q) => $q->where('student_id', $student->id))
                 ->orderByDesc('created_at')
-                ->get();
+                ->paginate(8);
         }
 
         return view('siswa.pembayaran', compact('student', 'payments'));
     }
 
-    public function pesan()
+    public function pesan(Request $request)
     {
         $userId  = session('user.id');
         $student = Student::where('user_id', $userId)->first();
 
+        // Daftar tutor yang pernah di-booking
         $tutors = collect();
+        $messages = collect();
+        $activeTutor = null;
+        $activeTutorUserId = null;
+
         if ($student) {
-            $tutors = Booking::with('schedule.tutor')
+            $tutors = Booking::with('schedule.tutor.user')
                 ->where('student_id', $student->id)
                 ->get()
                 ->pluck('schedule.tutor')
                 ->filter()
                 ->unique('id')
                 ->values();
+
+            // Ambil pesan dengan tutor yang dipilih
+            $activeTutorId = $request->query('tutor');
+            if ($activeTutorId) {
+                $activeTutor = Tutor::with('user')->find($activeTutorId);
+                if ($activeTutor) {
+                    $activeTutorUserId = $activeTutor->user_id;
+                    $messages = \App\Models\Message::where(function ($q) use ($userId, $activeTutorUserId) {
+                        $q->where('sender_id', $userId)->where('receiver_id', $activeTutorUserId);
+                    })->orWhere(function ($q) use ($userId, $activeTutorUserId) {
+                        $q->where('sender_id', $activeTutorUserId)->where('receiver_id', $userId);
+                    })->orderBy('created_at')->get();
+
+                    // Tandai pesan sebagai sudah dibaca
+                    \App\Models\Message::where('sender_id', $activeTutorUserId)
+                        ->where('receiver_id', $userId)
+                        ->where('is_read', false)
+                        ->update(['is_read' => true]);
+                }
+            }
         }
 
-        return view('siswa.pesan', compact('student', 'tutors'));
+        return view('siswa.pesan', compact('student', 'tutors', 'messages', 'activeTutor', 'activeTutorUserId'));
+    }
+
+    public function kirimPesan(Request $request)
+    {
+        $userId    = session('user.id');
+        $body      = trim($request->input('body', ''));
+        $receiverId = intval($request->input('receiver_id'));
+
+        if (empty($body) || !$receiverId) {
+            return back()->with('error', 'Pesan tidak boleh kosong.');
+        }
+
+        \App\Models\Message::create([
+            'sender_id'   => $userId,
+            'receiver_id' => $receiverId,
+            'body'        => $body,
+        ]);
+
+        // Redirect ke pesan dengan tutor yang sama
+        $tutor = Tutor::where('user_id', $receiverId)->first();
+        return redirect()->route('siswa.pesan', ['tutor' => $tutor?->id ?? ''])
+            ->with('success', 'Pesan terkirim.');
     }
 
     public function pengaturan()
@@ -205,17 +294,53 @@ class SiswaController extends Controller
         return redirect()->route('siswa.ulasan')->with('success', 'Ulasan berhasil dikirim. Terima kasih!');
     }
 
-    public function cariTutor()
+    public function cariTutor(Request $request)
     {
-        $schedules = Schedule::with(['tutor', 'subject'])
-            ->where('status', 'tersedia')
-            ->whereHas('tutor', fn($q) => $q->where('status', 'aktif'))
-            ->get()
-            ->groupBy('tutor_id');
+        $keyword    = trim($request->input('keyword', ''));
+        $minHarga   = (int) $request->input('min_harga', 0);
+        $maxHarga   = (int) $request->input('max_harga', 0); // 0 = unlimited
+        $sort       = $request->input('sort', 'relevansi');
+        $subjectIds = $request->input('subject', []);
 
-        $tutors = Tutor::with('subject')->where('status', 'aktif')->get();
+        $query = Tutor::with(['subject', 'reviews'])
+            ->where('status', 'aktif')
+            ->whereHas('schedules', fn($q) => $q->where('status', 'tersedia'));
 
-        return view('siswa.cari-tutor', compact('schedules', 'tutors'));
+        // Filter: keyword (nama tutor atau mata pelajaran)
+        if ($keyword !== '') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhereHas('subject', fn($sq) => $sq->where('nama_mapel', 'like', "%{$keyword}%"))
+                  ->orWhere('bio', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Filter: mata pelajaran (checkbox)
+        if (!empty($subjectIds)) {
+            $query->whereIn('subject_id', $subjectIds);
+        }
+
+        // Filter: harga min
+        if ($minHarga > 0) {
+            $query->where('tarif', '>=', $minHarga);
+        }
+        // Filter: harga max (abaikan jika 500000 = unlimited)
+        if ($maxHarga > 0 && $maxHarga < 500000) {
+            $query->where('tarif', '<=', $maxHarga);
+        }
+
+        // Sort
+        $query = match ($sort) {
+            'harga_asc'  => $query->orderBy('tarif', 'asc'),
+            'harga_desc' => $query->orderBy('tarif', 'desc'),
+            'rating'     => $query->withCount('reviews')->orderByDesc('reviews_count'),
+            default      => $query->orderBy('name', 'asc'),
+        };
+
+        $tutors   = $query->get();
+        $subjects = \App\Models\Subject::orderBy('nama_mapel')->get();
+
+        return view('siswa.cari-tutor', compact('tutors', 'subjects', 'keyword', 'minHarga', 'maxHarga', 'sort', 'subjectIds'));
     }
 
     public function tutorProfil($id)
@@ -249,9 +374,30 @@ class SiswaController extends Controller
             $metode = 'transfer';
         }
 
+        // Cari atau buat student record otomatis jika belum ada
         $student = Student::where('user_id', $userId)->first();
         if (!$student) {
-            return redirect()->route('siswa.cari-tutor')->with('error', 'Data siswa tidak ditemukan.');
+            $user = \App\Models\User::find($userId);
+            if (!$user) {
+                return redirect()->route('siswa.dashboard')->with('error', 'Sesi tidak valid. Silakan login ulang.');
+            }
+            $student = Student::create([
+                'user_id' => $userId,
+                'name'    => $user->name,
+            ]);
+        }
+
+        if (!$scheduleId) {
+            return redirect()->back()->with('error', 'Jadwal tidak dipilih.');
+        }
+
+        $schedule = Schedule::with('tutor')->find($scheduleId);
+        if (!$schedule) {
+            return redirect()->back()->with('error', 'Jadwal tidak ditemukan.');
+        }
+
+        if ($schedule->status !== 'tersedia') {
+            return redirect()->back()->with('error', 'Jadwal ini sudah tidak tersedia. Silakan pilih jadwal lain.');
         }
 
         $existing = Booking::where('student_id', $student->id)
@@ -260,29 +406,30 @@ class SiswaController extends Controller
             ->first();
 
         if ($existing) {
-            return redirect()->route('siswa.cari-tutor')->with('error', 'Kamu sudah memiliki booking aktif untuk jadwal ini.');
+            // Sudah ada booking aktif → langsung ke gateway
+            return redirect()->route('siswa.gateway', $existing->id)
+                ->with('info', 'Kamu sudah memiliki booking aktif untuk jadwal ini.');
         }
 
-        $schedule = Schedule::with('tutor')->find($scheduleId);
-        if (!$schedule || $schedule->status !== 'tersedia') {
-            return redirect()->route('siswa.cari-tutor')->with('error', 'Jadwal tidak tersedia.');
-        }
+        $b = DB::transaction(function () use ($student, $scheduleId, $metode, $schedule) {
+            $booking = Booking::create([
+                'student_id'        => $student->id,
+                'schedule_id'       => $scheduleId,
+                'tanggal_booking'   => now(),
+                'metode_pembayaran' => $metode,
+                'status_pembayaran' => 'menunggu',
+                'status_booking'    => 'pending',
+            ]);
 
-        $b = Booking::create([
-            'student_id'        => $student->id,
-            'schedule_id'       => $scheduleId,
-            'tanggal_booking'   => now(),
-            'metode_pembayaran' => $metode,
-            'status_pembayaran' => 'menunggu',
-            'status_booking'    => 'pending',
-        ]);
+            Payment::create([
+                'booking_id' => $booking->id,
+                'jumlah'     => ($schedule->tutor->tarif ?? 150000) + 4000,
+                'metode'     => $metode,
+                'status'     => 'menunggu',
+            ]);
 
-        Payment::create([
-            'booking_id' => $b->id,
-            'jumlah'     => $schedule->tutor->tarif + 4000,
-            'metode'     => $metode,
-            'status'     => 'menunggu',
-        ]);
+            return $booking;
+        });
 
         return redirect()->route('siswa.gateway', $b->id);
     }
@@ -327,5 +474,45 @@ class SiswaController extends Controller
         Payment::where('booking_id', $bookingId)->update(['status' => 'gagal']);
 
         return redirect()->route('siswa.dashboard')->with('success', 'Booking berhasil dibatalkan.');
+    }
+
+    public function confirmPayment(Request $request, $id)
+    {
+        $userId  = session('user.id');
+        $student = Student::where('user_id', $userId)->first();
+
+        if (!$student) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        $booking = Booking::with(['schedule', 'payment'])
+            ->where('id', $id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if (!$booking) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Booking tidak ditemukan.');
+        }
+
+        if ($booking->status_booking === 'batal') {
+            return redirect()->route('siswa.dashboard')->with('error', 'Booking sudah dibatalkan.');
+        }
+
+        // Update payment status → berhasil
+        if ($booking->payment) {
+            $booking->payment->update([
+                'status'  => 'berhasil',
+                'paid_at' => now(),
+            ]);
+        }
+
+        // Update booking status_pembayaran → dibayar, status_booking → diterima
+        $booking->update([
+            'status_pembayaran' => 'dibayar',
+            'status_booking'    => 'diterima',
+        ]);
+
+        return redirect()->route('siswa.jadwal')
+            ->with('success', '✅ Pembayaran berhasil dikonfirmasi! Booking Anda sedang diproses tutor.');
     }
 }

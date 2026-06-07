@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Tutor - Brainova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
     <style>
         body { margin: 0; font-family: 'Inter', sans-serif; }
     </style>
@@ -70,7 +70,7 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Mata Pelajaran</span>
-                        <span class="info-value">{{ $tutor->subject->nama_mapel ?? '-' }}</span>
+                        <span class="info-value">{{ $tutor->subject?->nama_mapel ?? '-' }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Bio</span>

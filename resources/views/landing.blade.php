@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brainova - Belajar Online dengan Tutor Terbaik</title>
     <meta name="description" content="Temukan tutor idealmu di Brainova. Platform belajar online yang menghubungkan siswa dengan tutor profesional untuk berbagai mata pelajaran.">
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
 </head>
 <body>
     <!-- Navbar -->

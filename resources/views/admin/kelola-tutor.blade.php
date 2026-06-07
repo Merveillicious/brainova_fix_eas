@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Tutor - Brainova</title>
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
 </head>
 <body>
 <header class="app-topbar">
@@ -41,7 +41,7 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Mata Pelajaran</span>
-                        <span class="info-value">{{ $t->subject->nama_mapel ?? '-' }}</span>
+                        <span class="info-value">{{ $t->subject?->nama_mapel ?? '-' }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Bio</span>

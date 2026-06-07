@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Pembayaran - Brainova</title>
-    <link rel="stylesheet" href="{{ asset('css/brainova.css') }}">
+    @vite('resources/css/app.css')
 </head>
 <body>
 <header class="app-topbar">
@@ -18,6 +18,22 @@
     <main class="siswa-main">
         <h1 class="page-title">Kelola Pembayaran</h1>
         <p class="sub-text">Approve atau tolak pembayaran booking.</p>
+
+        {{-- Export Buttons --}}
+        <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+            <a href="{{ route('admin.report.pdf-pembayaran') }}" class="btn btn-primary" target="_blank">
+                📄 Download PDF Pembayaran
+            </a>
+            <a href="{{ route('admin.report.excel-pembayaran') }}" class="btn btn-secondary">
+                📊 Download Excel Pembayaran
+            </a>
+            <a href="{{ route('admin.report.pdf-booking') }}" class="btn btn-secondary" target="_blank">
+                📄 Download PDF Booking
+            </a>
+            <a href="{{ route('admin.report.excel-booking') }}" class="btn btn-secondary">
+                📊 Download Excel Booking
+            </a>
+        </div>
 
         @if(session('success'))
             <div class="alert-success">{{ session('success') }}</div>
@@ -46,7 +62,7 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Tutor</span>
-                        <span class="info-value">{{ $tutor->name ?? '-' }} ({{ $sc->subject->nama_mapel ?? '-' }})</span>
+                        <span class="info-value">{{ $tutor->name ?? '-' }} ({{ $sc->subject?->nama_mapel ?? '-' }})</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Jadwal</span>
