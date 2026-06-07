@@ -258,7 +258,8 @@
             if (!isset($totalPendapatan)) $totalPendapatan = 0;
             if (!isset($bulanIni))        $bulanIni        = 0;
             if (!isset($bookingData))     $bookingData     = collect();
-            $saldoTersedia = $totalPendapatan * 0.85; // Saldo setelah potongan platform
+            // Gunakan $saldoTersedia dari controller (sudah dikurangi penarikan)
+            if (!isset($saldoTersedia))   $saldoTersedia   = $totalPendapatan * 0.85;
         @endphp
 
         <div class="pm-stat-grid">
@@ -405,6 +406,68 @@
                     @endif
                 </tbody>
             </table>
+        </div>
+
+        {{-- ══ Riwayat Penarikan ══ --}}
+        <div class="pm-card" style="margin-top:24px;">
+            <div class="pm-table-header">
+                <div class="pm-table-title">Riwayat Penarikan Saldo</div>
+            </div>
+
+            @if(isset($withdrawals) && $withdrawals->isNotEmpty())
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <thead>
+                        <tr style="background:#f9fafb;">
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Tanggal</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Jumlah</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Metode</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Rekening</th>
+                            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($withdrawals as $wd)
+                        @php
+                            $wdMetode = ['transfer_bank'=>'🏦 Bank','gopay'=>'💚 GoPay','ovo'=>'💜 OVO','dana'=>'🔵 DANA'][$wd->metode] ?? $wd->metode;
+                            $wdBadge  = ['pending'=>'background:#fef3c7;color:#92400e;border:1.5px solid #FBBF24;',
+                                         'diproses'=>'background:#dbeafe;color:#1e40af;border:1.5px solid #3b82f6;',
+                                         'berhasil'=>'background:#dcfce7;color:#166534;border:1.5px solid #16a34a;',
+                                         'ditolak'=>'background:#fee2e2;color:#991b1b;border:1.5px solid #ef4444;'][$wd->status] ?? '';
+                        @endphp
+                        <tr style="border-bottom:1px solid #f3f4f6;">
+                            <td style="padding:12px 16px;color:#374151;">
+                                {{ \Carbon\Carbon::parse($wd->created_at)->format('d M Y') }}
+                                <div style="font-size:11px;color:#9ca3af;">{{ \Carbon\Carbon::parse($wd->created_at)->format('H:i') }}</div>
+                            </td>
+                            <td style="padding:12px 16px;font-size:15px;font-weight:800;color:#ef4444;">
+                                - Rp {{ number_format($wd->jumlah, 0, ',', '.') }}
+                            </td>
+                            <td style="padding:12px 16px;font-size:13px;font-weight:600;">{{ $wdMetode }}</td>
+                            <td style="padding:12px 16px;font-family:monospace;font-size:13px;font-weight:700;">
+                                {{ $wd->nomor_rekening }}
+                                <div style="font-size:11px;color:#6b7280;font-family:inherit;font-weight:400;">{{ $wd->nama_pemilik }}</div>
+                            </td>
+                            <td style="padding:12px 16px;text-align:center;">
+                                <span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;{{ $wdBadge }}">
+                                    {{ ucfirst($wd->status) }}
+                                </span>
+                                @if($wd->catatan)
+                                <div style="font-size:11px;color:#6b7280;margin-top:4px;">{{ $wd->catatan }}</div>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @else
+            <div style="padding:40px;text-align:center;color:#9ca3af;">
+                <div style="font-size:36px;margin-bottom:8px;">💸</div>
+                <div style="font-size:14px;font-weight:600;color:#6b7280;">Belum ada riwayat penarikan saldo.</div>
+                <div style="font-size:12px;margin-top:4px;">Klik tombol <strong>Tarik Saldo</strong> di atas untuk mengajukan penarikan.</div>
+            </div>
+            @endif
         </div>
 
     </main>

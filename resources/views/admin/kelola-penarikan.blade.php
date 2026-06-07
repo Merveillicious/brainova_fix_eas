@@ -129,18 +129,20 @@
                                     <button type="submit" class="btn-proses">⚙️ Proses</button>
                                 </form>
                                 {{-- Approve --}}
+                                @php $fmtJumlah = 'Rp ' . number_format($wd->jumlah, 0, ',', '.'); @endphp
                                 <form method="POST" action="{{ route('admin.penarikan.update') }}" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="withdrawal_id" value="{{ $wd->id }}">
                                     <input type="hidden" name="status" value="berhasil">
                                     <button type="submit" class="btn-approve"
-                                            onclick="return confirm('Setujui penarikan Rp {{ number_format($wd->jumlah,0,\',\',\'.\') }}?')">
+                                            onclick="return confirm('Setujui penarikan {{ $fmtJumlah }}?')">
                                         ✅ Approve
                                     </button>
                                 </form>
                                 {{-- Tolak --}}
-                                <button class="btn-reject"
-                                        onclick="openTolak({{ $wd->id }}, 'Rp {{ number_format($wd->jumlah,0,\',\',\'.\') }}')">
+                                <button class="btn-reject btn-tolak"
+                                        data-id="{{ $wd->id }}"
+                                        data-jumlah="{{ $fmtJumlah }}">
                                     ❌ Tolak
                                 </button>
                             </div>
@@ -205,6 +207,15 @@
 </div>
 
 <script>
+// Tombol tolak pakai data-attribute
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-tolak').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openTolak(this.dataset.id, this.dataset.jumlah);
+        });
+    });
+});
+
 function openTolak(id, jumlah) {
     document.getElementById('tolakId').value = id;
     document.getElementById('tolakInfo').textContent = 'Penarikan ' + jumlah + ' akan ditolak.';

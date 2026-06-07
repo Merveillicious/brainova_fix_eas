@@ -281,6 +281,8 @@ class TutorController extends Controller
         $chartValues = [];
         $totalPendapatan = 0;
         $bulanIni = 0;
+        $withdrawals = collect();
+        $sudahDitarik = 0;
 
         if ($tutor) {
             $bookingData = Booking::whereHas('schedule', fn($q) => $q->where('tutor_id', $tutor->id))
@@ -303,10 +305,23 @@ class TutorController extends Controller
                     ->filter(fn($b) => \Carbon\Carbon::parse($b->tanggal_booking)->format('Y-m') === $bulan->format('Y-m'))
                     ->sum(fn($b) => $b->payment->jumlah ?? 0);
             }
+
+            // Riwayat penarikan
+            $withdrawals = Withdrawal::where('tutor_id', $tutor->id)
+                ->orderByDesc('created_at')
+                ->get();
+
+            $sudahDitarik = $withdrawals->whereIn('status', ['pending', 'diproses', 'berhasil'])->sum('jumlah');
         }
 
-        return view('tutor.pendapatan', compact('tutor', 'bookingData', 'totalPendapatan', 'bulanIni', 'chartLabels', 'chartValues'));
+        $saldoTersedia = ($totalPendapatan * 0.85) - $sudahDitarik;
+
+        return view('tutor.pendapatan', compact(
+            'tutor', 'bookingData', 'totalPendapatan', 'bulanIni',
+            'chartLabels', 'chartValues', 'withdrawals', 'saldoTersedia'
+        ));
     }
+
 
     public function ulasan()
     {
