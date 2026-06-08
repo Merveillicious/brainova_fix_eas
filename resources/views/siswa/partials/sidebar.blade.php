@@ -5,8 +5,16 @@
 
 <aside class="siswa-sidebar">
     <div class="sidebar-profile">
-        <img src="https://ui-avatars.com/api/?name={{ urlencode($student->name ?? 'S') }}&background=000&color=fff"
-             class="sidebar-avatar" alt="Avatar">
+        @if(isset($user) && $user->photo)
+            <img src="{{ asset('storage/photos/' . $user->photo) }}"
+                 class="sidebar-avatar" alt="Avatar">
+        @elseif(isset($student) && $student->user && $student->user->photo)
+            <img src="{{ asset('storage/photos/' . $student->user->photo) }}"
+                 class="sidebar-avatar" alt="Avatar">
+        @else
+            <img src="https://ui-avatars.com/api/?name={{ urlencode($student->name ?? 'S') }}&background=000&color=fff"
+                 class="sidebar-avatar" alt="Avatar">
+        @endif
         <div class="sidebar-name">{{ explode(' ', trim($student->name ?? 'Siswa'))[0] }}</div>
         <div class="sidebar-role">Siswa</div>
     </div>

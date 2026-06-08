@@ -256,21 +256,29 @@
 
                 {{-- Avatar --}}
                 <div class="pg-avatar-row">
-                    <img class="pg-avatar-img"
-                         src="https://ui-avatars.com/api/?name={{ urlencode(session('user.name', 'Tutor')) }}&background=000&color=fff&size=128"
-                         alt="Avatar" id="avatarPreview">
+                    @php $tutorUser = \App\Models\User::find(session('user.id')); @endphp
+                    @if($tutorUser && $tutorUser->photo)
+                        <img class="pg-avatar-img"
+                             src="{{ asset('storage/photos/' . $tutorUser->photo) }}"
+                             alt="Avatar" id="avatarPreview">
+                    @else
+                        <img class="pg-avatar-img"
+                             src="https://ui-avatars.com/api/?name={{ urlencode(session('user.name', 'Tutor')) }}&background=000&color=fff&size=128"
+                             alt="Avatar" id="avatarPreview">
+                    @endif
                     <div class="pg-avatar-info">
                         <button type="button" class="btn-ubah-foto" onclick="document.getElementById('fotoInput').click()">
                             Ubah Foto
                         </button>
-                        <input type="file" id="fotoInput" accept="image/jpg,image/jpeg,image/png"
-                               style="display:none" onchange="previewFoto(this)">
                         <div class="pg-foto-hint">Format JPG atau PNG. Maksimal 2MB.</div>
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('tutor.pengaturan.profil') }}">
+                <form method="POST" action="{{ route('tutor.pengaturan.profil') }}" enctype="multipart/form-data">
                     @csrf
+                    {{-- File input inside form --}}
+                    <input type="file" id="fotoInput" name="photo" accept="image/jpg,image/jpeg,image/png"
+                           style="display:none" onchange="previewFoto(this)">
                     <div class="pg-form-grid">
                         <div class="pg-form-group">
                             <label class="pg-label" for="name">Nama Lengkap</label>

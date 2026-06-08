@@ -185,7 +185,7 @@
                          onclick="window.location.href='{{ route('siswa.tutor-profil', $tutor->id) }}'">
                         <div class="tutor-info-wrap" style="gap:16px;">
                             <div class="tutor-avatar-wrap" style="width:56px;height:56px;">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" alt="Avatar">
+                                <img src="{{ $tutor->photo_url }}" alt="Avatar">
                                 <div class="tutor-verified" style="width:16px;height:16px;">
                                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>

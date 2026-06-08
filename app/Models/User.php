@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    protected $fillable = ['name', 'email', 'password', 'role', 'phone'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'phone', 'photo'];
 
     // No hashing — plain text password same as original
     public function getAuthPassword()

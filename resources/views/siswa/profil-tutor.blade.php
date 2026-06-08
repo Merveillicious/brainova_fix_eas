@@ -21,7 +21,7 @@
             <!-- Header Card -->
             <div class="profil-header-card">
                 <div class="profil-top-info">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" alt="Avatar">
+                    <img src="{{ $tutor->photo_url }}" alt="Avatar">
                     <h1>{{ $tutor->name }} <div style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; background:#f5a623; color:#fff; border-radius:50%; border:2px solid #fff; font-size:12px; margin-left:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></h1>
                 </div>
                 <div class="profil-stats">
@@ -90,7 +90,7 @@
         <aside class="profil-sidebar">
             <div class="booking-card">
                 <div class="booking-header">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" alt="Avatar">
+                    <img src="{{ $tutor->photo_url }}" alt="Avatar">
                     Pesan kelas dengan {{ explode(' ', trim($tutor->name))[0] }}.
                 </div>
 

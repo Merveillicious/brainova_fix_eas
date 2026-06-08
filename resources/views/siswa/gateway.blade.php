@@ -135,34 +135,8 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Accordion Item 2 -->
-        <div class="gw-method">
-            <div class="gw-method-header">
-                <div class="gw-radio-wrap">
-                    <div class="gw-radio"></div>
-                    <div>
-                        <div class="gw-method-title">Transfer Bank</div>
-                        <div class="gw-method-desc">BCA, Mandiri, BNI, BRI — Virtual Account</div>
-                    </div>
-                </div>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-        </div>
 
-        <!-- Accordion Item 3 -->
-        <div class="gw-method" style="border-bottom:none;">
-            <div class="gw-method-header">
-                <div class="gw-radio-wrap">
-                    <div class="gw-radio"></div>
-                    <div>
-                        <div class="gw-method-title">Dompet Digital</div>
-                        <div class="gw-method-desc">GoPay, OVO, DANA, ShopeePay</div>
-                    </div>
-                </div>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-        </div>
+
         
         <div class="gw-footer-area">
             <div class="gw-secure-text">
@@ -196,7 +170,7 @@
     <!-- Kanan: Ringkasan Pemesanan -->
     <div class="gw-card">
         <div class="gw-sum-header">
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=random" class="gw-sum-avatar" alt="Avatar">
+            <img src="{{ $tutor->photo_url }}" class="gw-sum-avatar" alt="Avatar">
             <div>
                 <div class="gw-sum-tutor">{{ $tutor?->name ?? '-' }}</div>
                 <div class="gw-sum-sub">{{ $subject?->nama_mapel ?? 'Matematika' }} · {{ \Carbon\Carbon::parse($booking->schedule?->tanggal)->translatedFormat('j M Y') }}</div>

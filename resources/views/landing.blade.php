@@ -9,18 +9,13 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container nav-container">
-            <a href="{{ route('home') }}" class="brand">
-                <div class="brand-dot"></div>
-                Brainova
-            </a>
-            <div class="nav-actions">
-                <a href="{{ route('login') }}" class="btn btn-outline">Log in</a>
-                <a href="{{ route('register') }}" class="btn btn-primary">Daftar Sekarang</a>
-            </div>
+    <div class="auth-topbar">
+        <a href="{{ route('home') }}" class="brand">Brainova</a>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <a href="{{ route('login') }}" class="btn-topbar">Log in</a>
+            <a href="{{ route('register') }}" class="btn-topbar">Daftar Sekarang</a>
         </div>
-    </nav>
+    </div>
 
     <!-- Hero -->
     <section class="hero">

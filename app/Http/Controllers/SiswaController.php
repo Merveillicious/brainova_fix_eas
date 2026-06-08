@@ -33,7 +33,7 @@ class SiswaController extends Controller
         $sort       = $request->input('sort', 'relevansi');
         $subjectIds = $request->input('subject', []);
 
-        $query = Tutor::with(['subject', 'reviews'])
+        $query = Tutor::with(['subject', 'reviews', 'user'])
             ->where('status', 'aktif')
             ->whereHas('schedules', fn($q) => $q->where('status', 'tersedia'));
 
@@ -191,10 +191,38 @@ class SiswaController extends Controller
 
         if (!$user) return back()->with('error', 'User tidak ditemukan.');
 
-        $user->update([
+        $data = [
             'name'  => trim($request->input('name', $user->name)),
             'phone' => trim($request->input('phone', '')),
-        ]);
+        ];
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+
+            // Validate
+            if (!in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/jpg'])) {
+                return back()->with('error', 'Format foto harus JPG atau PNG.');
+            }
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return back()->with('error', 'Ukuran foto maksimal 2MB.');
+            }
+
+            // Delete old photo
+            if ($user->photo && file_exists(public_path('storage/photos/' . $user->photo))) {
+                unlink(public_path('storage/photos/' . $user->photo));
+            }
+
+            // Store new photo
+            $filename = 'user_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/photos'), $filename);
+            $data['photo'] = $filename;
+
+            // Update session
+            $request->session()->put('user.photo', $filename);
+        }
+
+        $user->update($data);
 
         // Update session name
         $request->session()->put('user.name', $user->name);
@@ -205,6 +233,7 @@ class SiswaController extends Controller
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
+
 
     public function updateSandi(Request $request)
     {
@@ -302,7 +331,7 @@ class SiswaController extends Controller
         $sort       = $request->input('sort', 'relevansi');
         $subjectIds = $request->input('subject', []);
 
-        $query = Tutor::with(['subject', 'reviews'])
+        $query = Tutor::with(['subject', 'reviews', 'user'])
             ->where('status', 'aktif')
             ->whereHas('schedules', fn($q) => $q->where('status', 'tersedia'));
 
@@ -345,7 +374,7 @@ class SiswaController extends Controller
 
     public function tutorProfil($id)
     {
-        $tutor = Tutor::with('subject')->findOrFail($id);
+        $tutor = Tutor::with(['subject', 'user'])->findOrFail($id);
         
         $schedules = Schedule::where('tutor_id', $id)
             ->where('status', 'tersedia')

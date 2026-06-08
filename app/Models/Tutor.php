@@ -27,4 +27,16 @@ class Tutor extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Get the photo URL — actual upload if exists, otherwise ui-avatars fallback.
+     */
+    public function getPhotoUrlAttribute(): string
+    {
+        $photo = $this->user?->photo;
+        if ($photo && file_exists(public_path('storage/photos/' . $photo))) {
+            return asset('storage/photos/' . $photo);
+        }
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random&color=fff';
+    }
 }

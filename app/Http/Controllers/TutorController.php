@@ -422,21 +422,45 @@ class TutorController extends Controller
         $user   = \App\Models\User::find($userId);
         if (!$user) return back()->with('error', 'User tidak ditemukan.');
 
-        $name  = trim($request->input('name', $user->name));
-        $phone = trim($request->input('phone', ''));
+        $data = [
+            'name'  => trim($request->input('name', $user->name)),
+            'phone' => trim($request->input('phone', '')),
+        ];
 
-        $user->update([
-            'name'  => $name,
-            'phone' => $phone,
-        ]);
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+
+            if (!in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/jpg'])) {
+                return back()->with('error', 'Format foto harus JPG atau PNG.');
+            }
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return back()->with('error', 'Ukuran foto maksimal 2MB.');
+            }
+
+            // Delete old photo
+            if ($user->photo && file_exists(public_path('storage/photos/' . $user->photo))) {
+                unlink(public_path('storage/photos/' . $user->photo));
+            }
+
+            // Store new photo
+            $filename = 'user_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/photos'), $filename);
+            $data['photo'] = $filename;
+
+            $request->session()->put('user.photo', $filename);
+        }
+
+        $user->update($data);
 
         // Update session dan tutor name
-        $request->session()->put('user.name', $name);
+        $request->session()->put('user.name', $data['name']);
         $tutor = Tutor::where('user_id', $userId)->first();
-        if ($tutor) $tutor->update(['name' => $name]);
+        if ($tutor) $tutor->update(['name' => $data['name']]);
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
+
 
     public function updateSandiAkun(Request $request)
     {

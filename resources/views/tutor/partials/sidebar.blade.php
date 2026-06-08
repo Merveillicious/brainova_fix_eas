@@ -7,9 +7,15 @@
 @endphp
 
 <aside class="siswa-sidebar">
-    <div class="sidebar-profile" style="text-align:center;">
-        <img src="https://ui-avatars.com/api/?name={{ urlencode($tutorName) }}&background=000&color=fff&size=128"
-             class="sidebar-avatar" alt="Avatar" style="display:block;margin:0 auto 12px;">
+    <div class="sidebar-profile">
+        @php $tutorUser = \App\Models\User::find(session('user.id')); @endphp
+        @if($tutorUser && $tutorUser->photo)
+            <img src="{{ asset('storage/photos/' . $tutorUser->photo) }}"
+                 class="sidebar-avatar" alt="Avatar">
+        @else
+            <img src="https://ui-avatars.com/api/?name={{ urlencode($tutorName) }}&background=000&color=fff&size=128"
+                 class="sidebar-avatar" alt="Avatar">
+        @endif
         <div class="sidebar-name">{{ explode(' ', trim($tutorName))[0] }}</div>
         <div class="sidebar-role" style="background:#FBBF24; color:#000;">TUTOR</div>
     </div>
