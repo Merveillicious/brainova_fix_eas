@@ -105,7 +105,17 @@
             vertical-align: middle;
         }
         .pb-table tbody tr:last-child td { border-bottom: none; }
-        .pb-table tbody tr:hover td { background: #fffbeb; }
+        .pb-table tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .pb-table tbody tr.clickable-row:hover td { background: #fffbeb; }
+        .pb-table tbody tr.clickable-row:hover .pb-row-arrow { opacity: 1; transform: translateX(3px); }
+        .pb-row-arrow {
+            opacity: 0;
+            transition: opacity .15s, transform .15s;
+            color: #9ca3af;
+        }
 
         /* deskripsi cell */
         .pb-desc-wrap { display: flex; align-items: center; gap: 12px; }
@@ -245,16 +255,16 @@
             <div class="pb-table-header">
                 <div class="pb-table-title">Riwayat Transaksi</div>
                 <div class="pb-filter-row">
-                    <select class="pb-filter-select">
-                        <option>Semua Status</option>
-                        <option>Berhasil</option>
-                        <option>Menunggu</option>
-                        <option>Gagal</option>
+                    <select class="pb-filter-select" id="filterStatus" onchange="filterTable()">
+                        <option value="">Semua Status</option>
+                        <option value="berhasil">Berhasil</option>
+                        <option value="menunggu">Menunggu</option>
+                        <option value="gagal">Gagal</option>
                     </select>
-                    <select class="pb-filter-select">
-                        <option>Semua Metode</option>
-                        <option>Transfer</option>
-                        <option>E-Wallet</option>
+                    <select class="pb-filter-select" id="filterMetode" onchange="filterTable()">
+                        <option value="">Semua Metode</option>
+                        <option value="transfer">Transfer</option>
+                        <option value="ewallet">E-Wallet</option>
                     </select>
                 </div>
             </div>
@@ -275,6 +285,7 @@
                             <th>Metode</th>
                             <th>Nominal</th>
                             <th>Status</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -287,7 +298,15 @@
                             $invoice = 'INV-' . date('Y', strtotime($pay->created_at)) . '-' . str_pad($pay->id, 3, '0', STR_PAD_LEFT);
                             $deskripsi = 'Sesi ' . ($subject?->nama_mapel ?? 'Kelas') . ($tutor ? ' - ' . $tutor->name : '');
                         @endphp
-                        <tr>
+                        @php
+                            $detailUrl = $booking ? route('siswa.gateway.status', $booking->id) : '#';
+                        @endphp
+                        <tr class="clickable-row"
+                            data-status="{{ $pay->status }}"
+                            data-metode="{{ $pay->metode }}"
+                            data-href="{{ $detailUrl }}"
+                            onclick="window.location='{{ $detailUrl }}'">
+
                             {{-- Tanggal --}}
                             <td class="pb-date">
                                 {{ $pay->created_at ? \Carbon\Carbon::parse($pay->created_at)->translatedFormat('j M Y') : '-' }}
@@ -327,10 +346,21 @@
                                     {{ ucfirst($pay->status) }}
                                 </span>
                             </td>
+
+                            {{-- Arrow --}}
+                            <td style="width:32px;padding-right:20px;">
+                                <svg class="pb-row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18l6-6-6-6"/>
+                                </svg>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+                <div id="filterEmptyMsg" style="display:none; text-align:center; padding:48px 20px; color:#aaa;">
+                    <div style="font-size:36px; margin-bottom:10px;">🔍</div>
+                    <div style="font-size:14px; font-weight:600; color:#555;">Tidak ada transaksi yang cocok dengan filter</div>
+                </div>
             @endif
         </div>
 
@@ -343,5 +373,32 @@
 
     </main>
 </div>
+
+<script>
+function filterTable() {
+    const status = document.getElementById('filterStatus').value.toLowerCase();
+    const metode = document.getElementById('filterMetode').value.toLowerCase();
+    const rows   = document.querySelectorAll('.pb-table tbody tr');
+    let visible  = 0;
+
+    rows.forEach(row => {
+        const rowStatus = row.dataset.status || '';
+        const rowMetode = row.dataset.metode || '';
+        const matchStatus = !status || rowStatus === status;
+        const matchMetode = !metode || rowMetode === metode;
+
+        if (matchStatus && matchMetode) {
+            row.style.display = '';
+            visible++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Tampilkan pesan kosong jika tidak ada hasil
+    const emptyMsg = document.getElementById('filterEmptyMsg');
+    if (emptyMsg) emptyMsg.style.display = visible === 0 ? '' : 'none';
+}
+</script>
 </body>
 </html>

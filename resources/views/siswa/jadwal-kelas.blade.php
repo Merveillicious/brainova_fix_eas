@@ -354,6 +354,14 @@
                     {{-- Button --}}
                     @if($isLive)
                         <a href="#" class="jk-btn-join">Join Kelas</a>
+                    @elseif($booking->status_pembayaran === 'menunggu_konfirmasi')
+                        <a href="{{ route('siswa.gateway.status', $booking->id) }}" class="jk-btn-join" style="background:#fef3c7;color:#92400e;border-color:#f59e0b;">
+                            ⏳ Cek Status Pembayaran
+                        </a>
+                    @elseif($booking->status_pembayaran === 'menunggu' && $booking->status_booking === 'pending')
+                        <a href="{{ route('siswa.gateway', $booking->id) }}" class="jk-btn-join outline">
+                            💳 Selesaikan Pembayaran
+                        </a>
                     @else
                         <a href="#" class="jk-btn-join outline">Join Kelas</a>
                     @endif

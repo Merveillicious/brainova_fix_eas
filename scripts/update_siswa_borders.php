@@ -1,5 +1,6 @@
 <?php
-$dir = __DIR__ . '/resources/views/siswa';
+$projectRoot = dirname(__DIR__);
+$dir = $projectRoot . '/resources/views/siswa';
 $files = scandir($dir);
 foreach($files as $file) {
     if(pathinfo($file, PATHINFO_EXTENSION) === 'php') {

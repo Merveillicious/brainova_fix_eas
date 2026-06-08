@@ -1,9 +1,11 @@
 <?php
 
+$projectRoot = dirname(__DIR__);
+
 $directories = [
-    __DIR__ . '/resources/views/siswa',
-    __DIR__ . '/resources/views/tutor',
-    __DIR__ . '/resources/views/admin',
+    $projectRoot . '/resources/views/siswa',
+    $projectRoot . '/resources/views/tutor',
+    $projectRoot . '/resources/views/admin',
 ];
 
 $unifiedHeaderAdmin = <<<HTML

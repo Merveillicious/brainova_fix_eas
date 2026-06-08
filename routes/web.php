@@ -62,6 +62,7 @@ Route::middleware(['brainova.auth:siswa'])->prefix('siswa')->name('siswa.')->gro
     Route::post('/checkout',    [SiswaController::class, 'checkout'])->name('checkout');
     Route::post('/booking',     [SiswaController::class, 'booking'])->name('booking');
     Route::get('/gateway/{id}', [SiswaController::class, 'gateway'])->name('gateway');
+    Route::get('/gateway/{id}/status',   [SiswaController::class, 'paymentStatus'])->name('gateway.status');
     Route::post('/gateway/{id}/confirm', [SiswaController::class, 'confirmPayment'])->name('gateway.confirm');
     Route::post('/booking/cancel', [SiswaController::class, 'cancelBooking'])->name('booking.cancel');
 });

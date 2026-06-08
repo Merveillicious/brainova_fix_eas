@@ -427,6 +427,13 @@ class TutorController extends Controller
             'phone' => trim($request->input('phone', '')),
         ];
 
+        // Handle bio update
+        $bio = trim($request->input('bio', ''));
+        $tutor = Tutor::where('user_id', $userId)->first();
+        if ($tutor) {
+            $tutor->update(['bio' => $bio]);
+        }
+
         // Handle photo upload
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');

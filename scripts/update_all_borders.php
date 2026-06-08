@@ -1,8 +1,9 @@
 <?php
+$projectRoot = dirname(__DIR__);
 $dirs = [
-    __DIR__ . '/public/css',
-    __DIR__ . '/resources/views/siswa',
-    __DIR__ . '/resources/views/tutor',
+    $projectRoot . '/public/css',
+    $projectRoot . '/resources/views/siswa',
+    $projectRoot . '/resources/views/tutor',
 ];
 
 function processDir($dir) {

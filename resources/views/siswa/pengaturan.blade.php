@@ -133,6 +133,121 @@
             .pg-form-grid { grid-template-columns: 1fr; }
             .pg-section { padding: 20px; }
         }
+
+        /* ── Profile Preview Card ── */
+        .pg-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 860px) {
+            .pg-layout { grid-template-columns: 1fr; }
+        }
+
+        .pg-preview-wrap {
+            position: sticky;
+            top: 24px;
+        }
+        .pg-preview-card {
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .pg-preview-banner {
+            height: 72px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-bottom: 2px solid #000;
+        }
+        .pg-preview-body {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        .pg-preview-avatar-wrap {
+            margin-top: -36px;
+            margin-bottom: 12px;
+        }
+        .pg-preview-avatar {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #000;
+            object-fit: cover;
+            background: #000;
+        }
+        .pg-preview-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .pg-preview-email {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+        .pg-preview-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fef3c7;
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 16px;
+        }
+        .pg-preview-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .pg-preview-stat {
+            background: #f9fafb;
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .pg-preview-stat-val { font-size: 16px; font-weight: 800; color: #000; }
+        .pg-preview-stat-label { font-size: 10px; color: #6b7280; font-weight: 600; margin-top: 2px; }
+        .pg-preview-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            text-align: left;
+            margin-bottom: 6px;
+            margin-top: 8px;
+        }
+        .pg-preview-phone-val {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            text-align: left;
+            padding: 8px 10px;
+            background: #f9fafb;
+            border: 2px solid #000;
+            border-radius: 8px;
+        }
+        .pg-preview-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px dashed #e5e7eb;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -156,8 +271,59 @@
                 <div class="alert-error">{{ session('error') }}</div>
             @endif
 
+
             <h1 class="pg-title">Pengaturan Profil</h1>
             <p class="pg-sub">Kelola informasi pribadi, keamanan, dan preferensi akun Anda.</p>
+
+            <div class="pg-layout">
+
+            {{-- ══ LEFT: Profile Preview ══ --}}
+            <div class="pg-preview-wrap">
+                <div class="pg-preview-card">
+                    <div class="pg-preview-banner"></div>
+                    <div class="pg-preview-body">
+                        <div class="pg-preview-avatar-wrap">
+                            <img class="pg-preview-avatar" id="previewAvatarCard"
+                                 src="{{ $user->photo ? asset('storage/photos/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=000&color=fff&size=128' }}"
+                                 alt="Preview">
+                        </div>
+                        <div class="pg-preview-name" id="previewName">{{ $user->name }}</div>
+                        <div class="pg-preview-email">{{ $user->email }}</div>
+                        <div class="pg-preview-badge">🎓 Siswa</div>
+
+                        <div class="pg-preview-stats">
+                            <div class="pg-preview-stat">
+                                <div class="pg-preview-stat-val">{{ $student ? \App\Models\Booking::where('student_id', $student->id)->count() : 0 }}</div>
+                                <div class="pg-preview-stat-label">Booking</div>
+                            </div>
+                            <div class="pg-preview-stat">
+                                <div class="pg-preview-stat-val">{{ $student ? \App\Models\Booking::where('student_id', $student->id)->where('status_booking', 'selesai')->count() : 0 }}</div>
+                                <div class="pg-preview-stat-label">Selesai</div>
+                            </div>
+                        </div>
+
+                        @if($user->phone)
+                        <div class="pg-preview-label">WhatsApp</div>
+                        <div class="pg-preview-phone-val" id="previewPhone">{{ $user->phone }}</div>
+                        @else
+                        <div class="pg-preview-label">WhatsApp</div>
+                        <div class="pg-preview-phone-val" id="previewPhone" style="color:#d1d5db;">Belum diisi</div>
+                        @endif
+
+                        <div class="pg-preview-tag">👁 Tampilan profil publik Anda</div>
+
+                        <a href="{{ route('siswa.dashboard') }}"
+                           style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:10px;background:#fff;border:2px solid #000;border-radius:10px;font-size:13px;font-weight:700;color:#000;text-decoration:none;transition:background .15s;"
+                           onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fff'">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            Ke Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ══ RIGHT: Form ══ --}}
+            <div>
 
             {{-- ══ Informasi Pribadi ══ --}}
             <div class="pg-section">
@@ -253,6 +419,9 @@
 
 
 
+            </div> {{-- end right column --}}
+            </div> {{-- end pg-layout --}}
+
         </div>
     </main>
 </div>
@@ -267,10 +436,34 @@
             }
             const reader = new FileReader();
             reader.onload = e => {
+                // Update both avatars
                 document.getElementById('avatarPreview').src = e.target.result;
+                document.getElementById('previewAvatarCard').src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    // Live update name preview
+    document.getElementById('name').addEventListener('input', function() {
+        const val = this.value.trim() || '{{ $user->name }}';
+        document.getElementById('previewName').textContent = val;
+    });
+
+    // Live update phone preview
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            const phoneEl = document.getElementById('previewPhone');
+            const val = this.value.trim();
+            if (val) {
+                phoneEl.textContent = val;
+                phoneEl.style.color = '';
+            } else {
+                phoneEl.textContent = 'Belum diisi';
+                phoneEl.style.color = '#d1d5db';
+            }
+        });
     }
 
 

@@ -1,7 +1,9 @@
 <?php
 
+$projectRoot = dirname(__DIR__);
+
 $directories = [
-    __DIR__ . '/resources/views/auth',
+    $projectRoot . '/resources/views/auth',
 ];
 
 function removeSvgFromHeader($dir) {

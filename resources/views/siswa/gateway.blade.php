@@ -154,15 +154,33 @@
                         Lihat Jadwal Kelas
                     </a>
                 </div>
+            @elseif($booking->status_pembayaran === 'menunggu_konfirmasi')
+                {{-- Sudah submit, menunggu admin --}}
+                <div style="background:#fefce8;border:2px solid #ca8a04;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">⏳</div>
+                    <div style="font-weight:800;color:#92400e;font-size:15px;margin-bottom:4px;">Menunggu Konfirmasi Admin</div>
+                    <div style="font-size:12px;color:#78350f;">Pembayaran QRIS Anda sedang diverifikasi. Proses biasanya 1x24 jam.</div>
+                </div>
+                <div style="margin-top:12px;text-align:center;">
+                    <a href="{{ route('siswa.gateway.status', $booking->id) }}" class="gw-btn" style="text-decoration:none;display:inline-flex;background:#fbbf24;">
+                        Lihat Status Pembayaran
+                    </a>
+                </div>
+            @elseif(in_array($booking->status_booking, ['batal']))
+                {{-- Dibatalkan --}}
+                <div style="background:#fef2f2;border:2px solid #dc2626;border-radius:10px;padding:14px;text-align:center;font-weight:700;color:#991b1b;font-size:15px;">
+                    ❌ Booking telah dibatalkan
+                </div>
             @else
                 {{-- Tombol konfirmasi bayar --}}
                 <form method="POST" action="{{ route('siswa.gateway.confirm', $booking->id) }}" id="confirmForm">
                     @csrf
                     <button type="submit" class="gw-btn">
-                        Bayar dengan QRIS
+                        Saya Sudah Bayar via QRIS
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </button>
                 </form>
+                <div style="font-size:11px;color:#888;text-align:center;margin-top:8px;">Klik setelah selesai scan & bayar QRIS di atas</div>
             @endif
         </div>
     </div>

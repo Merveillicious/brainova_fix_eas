@@ -134,7 +134,7 @@
                     <input type="hidden" name="metode_pembayaran" value="transfer">
                     <button type="submit" class="btn-pesan-kelas">Pesan Kelas</button>
                 </form>
-                <button type="button" class="btn-chat">Chat Tutor</button>
+                <a href="{{ route('siswa.pesan', ['tutor' => $tutor->id]) }}" class="btn-chat">Chat Tutor</a>
             </div>
         </aside>
     </div>

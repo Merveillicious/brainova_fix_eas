@@ -527,21 +527,48 @@ class SiswaController extends Controller
             return redirect()->route('siswa.dashboard')->with('error', 'Booking sudah dibatalkan.');
         }
 
-        // Update payment status → berhasil
+        // Jika sudah dibayar sebelumnya, langsung ke status page
+        if ($booking->status_pembayaran === 'dibayar') {
+            return redirect()->route('siswa.gateway.status', $booking->id)
+                ->with('info', 'Pembayaran sudah dikonfirmasi sebelumnya.');
+        }
+
+        // Set payment status → menunggu (pending untuk dikonfirmasi admin)
         if ($booking->payment) {
             $booking->payment->update([
-                'status'  => 'berhasil',
-                'paid_at' => now(),
+                'status'  => 'menunggu',
+                'paid_at' => now(), // Waktu siswa klaim sudah bayar
             ]);
         }
 
-        // Update booking status_pembayaran → dibayar, status_booking → diterima
+        // Update booking: sudah bayar tapi menunggu konfirmasi admin
         $booking->update([
-            'status_pembayaran' => 'dibayar',
-            'status_booking'    => 'diterima',
+            'status_pembayaran' => 'menunggu_konfirmasi',
         ]);
 
-        return redirect()->route('siswa.jadwal')
-            ->with('success', '✅ Pembayaran berhasil dikonfirmasi! Booking Anda sedang diproses tutor.');
+        return redirect()->route('siswa.gateway.status', $booking->id)
+            ->with('success', '✅ Bukti pembayaran QRIS terkirim! Menunggu konfirmasi admin.');
+    }
+
+    public function paymentStatus($id)
+    {
+        $userId  = session('user.id');
+        $student = Student::where('user_id', $userId)->first();
+
+        if (!$student) {
+            return redirect()->route('siswa.dashboard');
+        }
+
+        $booking = Booking::with(['schedule.tutor', 'schedule.subject', 'payment'])
+            ->where('id', $id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        $hargaSesi    = $booking->schedule->tutor->tarif ?? 0;
+        $biayaLayanan = 4000;
+        $total        = $hargaSesi + $biayaLayanan;
+        $invoice      = 'INV-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+
+        return view('siswa.payment-status', compact('booking', 'hargaSesi', 'biayaLayanan', 'total', 'invoice'));
     }
 }

@@ -1,9 +1,11 @@
 <?php
 
+$projectRoot = dirname(__DIR__);
+
 $directories = [
-    __DIR__ . '/resources/views/siswa',
-    __DIR__ . '/resources/views/tutor',
-    __DIR__ . '/resources/views/admin',
+    $projectRoot . '/resources/views/siswa',
+    $projectRoot . '/resources/views/tutor',
+    $projectRoot . '/resources/views/admin',
 ];
 
 $headerHtml = <<<HTML
@@ -64,7 +66,7 @@ $cssContent = <<<CSS
 }
 CSS;
 
-$cssPath = __DIR__ . '/public/css/brainova.css';
+$cssPath = $projectRoot . '/public/css/brainova.css';
 if (strpos(file_get_contents($cssPath), '.global-header') === false) {
     file_put_contents($cssPath, "\n" . $cssContent, FILE_APPEND);
     echo "Added CSS to brainova.css\n";

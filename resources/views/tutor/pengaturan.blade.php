@@ -224,6 +224,118 @@
             .pg-section { padding: 20px; }
             .pg-mapel-input-row { flex-direction: column; align-items: stretch; }
         }
+
+        /* ── Profile Preview Layout ── */
+        .pg-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .pg-layout { grid-template-columns: 1fr; }
+        }
+        .pg-preview-wrap {
+            position: sticky;
+            top: 24px;
+        }
+        .pg-preview-card {
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .pg-preview-banner {
+            height: 72px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-bottom: 2px solid #000;
+        }
+        .pg-preview-body {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+        .pg-preview-avatar-wrap {
+            margin-top: -36px;
+            margin-bottom: 10px;
+        }
+        .pg-preview-avatar {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #000;
+            object-fit: cover;
+        }
+        .pg-preview-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 2px;
+            word-break: break-word;
+        }
+        .pg-preview-mapel {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        .pg-preview-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fef3c7;
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 14px;
+        }
+        .pg-preview-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .pg-preview-stat {
+            background: #f9fafb;
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 10px 8px;
+        }
+        .pg-preview-stat-val { font-size: 16px; font-weight: 800; color: #000; }
+        .pg-preview-stat-label { font-size: 10px; color: #6b7280; font-weight: 600; margin-top: 2px; }
+        .pg-preview-tarif {
+            background: #fbbf24;
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+        .pg-preview-tarif-label { font-size: 11px; font-weight: 600; color: #78350f; margin-bottom: 2px; }
+        .pg-preview-tarif-val { font-size: 18px; font-weight: 800; color: #000; }
+        .pg-preview-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .pg-preview-chip {
+            background: #000;
+            color: #fbbf24;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .pg-preview-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            padding-top: 12px;
+            border-top: 1px dashed #e5e7eb;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -247,8 +359,82 @@
                 <div class="alert-error">{{ session('error') }}</div>
             @endif
 
+
+            @php $tutorUser = \App\Models\User::find(session('user.id')); @endphp
+
             <h1 class="pg-title">Pengaturan Profil</h1>
             <p class="pg-sub">Kelola informasi pribadi, keamanan, dan preferensi akun Anda.</p>
+
+            <div class="pg-layout">
+
+            {{-- ══ LEFT: Profile Preview Card ══ --}}
+            <div class="pg-preview-wrap">
+                <div class="pg-preview-card">
+                    <div class="pg-preview-banner"></div>
+                    <div class="pg-preview-body">
+                        <div class="pg-preview-avatar-wrap">
+                            <img class="pg-preview-avatar" id="previewAvatarCard"
+                                 src="{{ $tutorUser && $tutorUser->photo ? asset('storage/photos/'.$tutorUser->photo) : 'https://ui-avatars.com/api/?name='.urlencode(session('user.name','Tutor')).'&background=000&color=fff&size=128' }}"
+                                 alt="Preview">
+                        </div>
+                        <div class="pg-preview-name" id="previewName">{{ session('user.name') }}</div>
+                        <div class="pg-preview-mapel" id="previewMapel">{{ $tutor?->subject?->nama_mapel ?? 'Mata Pelajaran' }}</div>
+                        <div class="pg-preview-badge">📚 Tutor Brainova</div>
+
+                        <div class="pg-preview-stats">
+                            <div class="pg-preview-stat">
+                                <div class="pg-preview-stat-val">
+                                    {{ $tutor ? \App\Models\Booking::whereHas('schedule', fn($q) => $q->where('tutor_id', $tutor->id))->count() : 0 }}
+                                </div>
+                                <div class="pg-preview-stat-label">Siswa</div>
+                            </div>
+                            <div class="pg-preview-stat">
+                                @php $avgRating = $tutor ? \App\Models\Review::where('tutor_id', $tutor->id)->avg('rating') : 0; @endphp
+                                <div class="pg-preview-stat-val">{{ $avgRating ? number_format($avgRating,1) : '-' }}</div>
+                                <div class="pg-preview-stat-label">Rating</div>
+                            </div>
+                        </div>
+
+                        <div class="pg-preview-tarif">
+                            <div class="pg-preview-tarif-label">Tarif per sesi</div>
+                            <div class="pg-preview-tarif-val" id="previewTarif">
+                                Rp {{ number_format($tutor?->tarif ?? 0, 0, ',', '.') }}
+                            </div>
+                        </div>
+
+                        <div class="pg-preview-chips" id="previewChips">
+                            @if($tutor?->subject)
+                                <span class="pg-preview-chip">{{ $tutor->subject->nama_mapel }}</span>
+                            @endif
+                        </div>
+
+                        {{-- Bio preview --}}
+                        @if($tutor?->bio)
+                        <div style="text-align:left;margin-top:8px;padding:10px 12px;background:#f9fafb;border:2px solid #000;border-radius:10px;">
+                            <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Tentang Saya</div>
+                            <div id="previewBio" style="font-size:12px;color:#374151;line-height:1.5;">{{ Str::limit($tutor->bio, 100) }}</div>
+                        </div>
+                        @else
+                        <div style="text-align:left;margin-top:8px;padding:10px 12px;background:#f9fafb;border:2px solid #000;border-radius:10px;">
+                            <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Tentang Saya</div>
+                            <div id="previewBio" style="font-size:12px;color:#d1d5db;line-height:1.5;">Belum ada deskripsi...</div>
+                        </div>
+                        @endif
+
+                        <span class="pg-preview-tag">👁 Tampilan profil publik Anda</span>
+
+                        <a href="{{ route('tutor.profil') }}" target="_blank"
+                           style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:10px;background:#fff;border:2px solid #000;border-radius:10px;font-size:13px;font-weight:700;color:#000;text-decoration:none;transition:background .15s;"
+                           onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fff'">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Lihat Profil Publik
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ══ RIGHT: Forms ══ --}}
+            <div>
 
             {{-- ══ Informasi Pribadi ══ --}}
             <div class="pg-section">
@@ -256,7 +442,6 @@
 
                 {{-- Avatar --}}
                 <div class="pg-avatar-row">
-                    @php $tutorUser = \App\Models\User::find(session('user.id')); @endphp
                     @if($tutorUser && $tutorUser->photo)
                         <img class="pg-avatar-img"
                              src="{{ asset('storage/photos/' . $tutorUser->photo) }}"
@@ -297,6 +482,16 @@
                             <input class="pg-input" type="text" id="phone" name="phone"
                                    placeholder="+62 812 3456 7890"
                                    value="{{ old('phone', $tutor->phone ?? '') }}">
+                        </div>
+                    </div>
+                    <div class="pg-form-grid full" style="margin-bottom:0;">
+                        <div class="pg-form-group">
+                            <label class="pg-label" for="bio">Tentang Saya</label>
+                            <textarea class="pg-input" id="bio" name="bio" rows="4"
+                                      placeholder="Ceritakan pengalaman mengajar, latar belakang pendidikan, dan keahlian Anda..."
+                                      style="resize:vertical; line-height:1.5;"
+                                      oninput="syncBioPreview(this.value)">{{ old('bio', $tutor?->bio ?? '') }}</textarea>
+                            <span style="font-size:11px;color:#9ca3af;">Tampil di halaman profil publik Anda</span>
                         </div>
                     </div>
                     <div class="pg-bottom-bar">
@@ -441,6 +636,9 @@
                 </form>
             </div>
 
+            </div> {{-- end right column --}}
+            </div> {{-- end pg-layout --}}
+
         </div>
     </main>
 </div>
@@ -457,9 +655,58 @@
             const reader = new FileReader();
             reader.onload = e => {
                 document.getElementById('avatarPreview').src = e.target.result;
+                document.getElementById('previewAvatarCard').src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    // Live: update bio
+    function syncBioPreview(val) {
+        const el = document.getElementById('previewBio');
+        if (!el) return;
+        const text = val.trim();
+        if (text) {
+            el.textContent = text.length > 100 ? text.substring(0, 100) + '...' : text;
+            el.style.color = '#374151';
+        } else {
+            el.textContent = 'Belum ada deskripsi...';
+            el.style.color = '#d1d5db';
+        }
+    }
+
+    // Live: update nama
+    document.getElementById('name').addEventListener('input', function() {
+        document.getElementById('previewName').textContent = this.value.trim() || '{{ session('user.name') }}';
+    });
+
+    // Live: update tarif
+    const tarifInput = document.getElementById('tarif');
+    if (tarifInput) {
+        tarifInput.addEventListener('input', function() {
+            const num = parseInt(this.value.replace(/\D/g,'')) || 0;
+            document.getElementById('previewTarif').textContent = 'Rp ' + num.toLocaleString('id-ID');
+        });
+    }
+
+    // Live: update chips mapel dari chips yang ada
+    function syncPreviewChips() {
+        const chips = document.querySelectorAll('#mapelChips .pg-chip');
+        const previewChips = document.getElementById('previewChips');
+        previewChips.innerHTML = '';
+        chips.forEach(chip => {
+            const text = chip.textContent.replace('×','').trim();
+            if (text) {
+                const el = document.createElement('span');
+                el.className = 'pg-preview-chip';
+                el.textContent = text;
+                previewChips.appendChild(el);
+            }
+        });
+        // Update subtitle mapel
+        const firstChip = chips[0];
+        document.getElementById('previewMapel').textContent =
+            firstChip ? firstChip.textContent.replace('×','').trim() : 'Mata Pelajaran';
     }
 
     /* ── Mata Pelajaran Chips ── */
@@ -475,10 +722,12 @@
         document.getElementById('mapelChips').appendChild(chip);
         input.value = '';
         input.focus();
+        syncPreviewChips();
     }
 
     function hapusChip(btn) {
         btn.closest('.pg-chip').remove();
+        syncPreviewChips();
     }
 
     /* ── Sertifikat Files ── */
